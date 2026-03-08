@@ -19,10 +19,10 @@ pres.writeFile({ fileName: "Presentation.pptx" });
 ## Layout Dimensions
 
 Slide dimensions (coordinates in inches):
-- `LAYOUT_16x9`: 10" × 5.625" (default)
-- `LAYOUT_16x10`: 10" × 6.25"
-- `LAYOUT_4x3`: 10" × 7.5"
-- `LAYOUT_WIDE`: 13.3" × 7.5"
+- `LAYOUT_16x9`: 10" 脳 5.625" (default)
+- `LAYOUT_16x10`: 10" 脳 6.25"
+- `LAYOUT_4x3`: 10" 脳 7.5"
+- `LAYOUT_WIDE`: 13.3" 脳 7.5"
 
 ---
 
@@ -65,15 +65,15 @@ slide.addText("Title", {
 ## Lists & Bullets
 
 ```javascript
-// �?CORRECT: Multiple bullets
+// 鉁?CORRECT: Multiple bullets
 slide.addText([
   { text: "First item", options: { bullet: true, breakLine: true } },
   { text: "Second item", options: { bullet: true, breakLine: true } },
   { text: "Third item", options: { bullet: true } }
 ], { x: 0.5, y: 0.5, w: 8, h: 3 });
 
-// �?WRONG: Never use unicode bullets
-slide.addText("�?First item", { ... });  // Creates double bullets
+// 鉂?WRONG: Never use unicode bullets
+slide.addText("鈥?First item", { ... });  // Creates double bullets
 
 // Sub-items and numbered lists
 { text: "Sub-item", options: { bullet: true, indentLevel: 1 } }
@@ -103,7 +103,7 @@ slide.addShape(pres.shapes.RECTANGLE, {
 });
 
 // Rounded rectangle (rectRadius only works with ROUNDED_RECTANGLE, not RECTANGLE)
-// ⚠️ Don't pair with rectangular accent overlays �?they won't cover rounded corners. Use RECTANGLE instead.
+// 鈿狅笍 Don't pair with rectangular accent overlays 鈥?they won't cover rounded corners. Use RECTANGLE instead.
 slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
   x: 1, y: 1, w: 3, h: 2,
   fill: { color: "FFFFFF" }, rectRadius: 0.1
@@ -122,13 +122,13 @@ Shadow options:
 | Property | Type | Range | Notes |
 |----------|------|-------|-------|
 | `type` | string | `"outer"`, `"inner"` | |
-| `color` | string | 6-char hex (e.g. `"000000"`) | No `#` prefix, no 8-char hex �?see Common Pitfalls |
+| `color` | string | 6-char hex (e.g. `"000000"`) | No `#` prefix, no 8-char hex 鈥?see Common Pitfalls |
 | `blur` | number | 0-100 pt | |
-| `offset` | number | 0-200 pt | **Must be non-negative** �?negative values corrupt the file |
+| `offset` | number | 0-200 pt | **Must be non-negative** 鈥?negative values corrupt the file |
 | `angle` | number | 0-359 degrees | Direction the shadow falls (135 = bottom-right, 270 = upward) |
 | `opacity` | number | 0.0-1.0 | Use this for transparency, never encode in color string |
 
-To cast a shadow upward (e.g. on a footer bar), use `angle: 270` with a positive offset �?do **not** use a negative offset.
+To cast a shadow upward (e.g. on a footer bar), use `angle: 270` with a positive offset 鈥?do **not** use a negative offset.
 
 **Note**: Gradient fills are not natively supported. Use a gradient image as a background instead.
 
@@ -365,21 +365,21 @@ titleSlide.addText("My Title", { placeholder: "title" });
 
 ## Common Pitfalls
 
-⚠️ These issues cause file corruption, visual bugs, or broken output. Avoid them.
+鈿狅笍 These issues cause file corruption, visual bugs, or broken output. Avoid them.
 
 1. **NEVER use "#" with hex colors** - causes file corruption
    ```javascript
-   color: "FF0000"      // �?CORRECT
-   color: "#FF0000"     // �?WRONG
+   color: "FF0000"      // 鉁?CORRECT
+   color: "#FF0000"     // 鉂?WRONG
    ```
 
 2. **NEVER encode opacity in hex color strings** - 8-char colors (e.g., `"00000020"`) corrupt the file. Use the `opacity` property instead.
    ```javascript
-   shadow: { type: "outer", blur: 6, offset: 2, color: "00000020" }          // �?CORRUPTS FILE
-   shadow: { type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.12 }  // �?CORRECT
+   shadow: { type: "outer", blur: 6, offset: 2, color: "00000020" }          // 鉂?CORRUPTS FILE
+   shadow: { type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.12 }  // 鉁?CORRECT
    ```
 
-3. **Use `bullet: true`** - NEVER unicode symbols like "�? (creates double bullets)
+3. **Use `bullet: true`** - NEVER unicode symbols like "鈥? (creates double bullets)
 
 4. **Use `breakLine: true`** between array items or text runs together
 
@@ -390,21 +390,21 @@ titleSlide.addText("My Title", { placeholder: "title" });
 7. **NEVER reuse option objects across calls** - PptxGenJS mutates objects in-place (e.g. converting shadow values to EMU). Sharing one object between multiple calls corrupts the second shape.
    ```javascript
    const shadow = { type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.15 };
-   slide.addShape(pres.shapes.RECTANGLE, { shadow, ... });  // �?second call gets already-converted values
+   slide.addShape(pres.shapes.RECTANGLE, { shadow, ... });  // 鉂?second call gets already-converted values
    slide.addShape(pres.shapes.RECTANGLE, { shadow, ... });
 
    const makeShadow = () => ({ type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.15 });
-   slide.addShape(pres.shapes.RECTANGLE, { shadow: makeShadow(), ... });  // �?fresh object each time
+   slide.addShape(pres.shapes.RECTANGLE, { shadow: makeShadow(), ... });  // 鉁?fresh object each time
    slide.addShape(pres.shapes.RECTANGLE, { shadow: makeShadow(), ... });
    ```
 
 8. **Don't use `ROUNDED_RECTANGLE` with accent borders** - rectangular overlay bars won't cover rounded corners. Use `RECTANGLE` instead.
    ```javascript
-   // �?WRONG: Accent bar doesn't cover rounded corners
+   // 鉂?WRONG: Accent bar doesn't cover rounded corners
    slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
    slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
 
-   // �?CORRECT: Use RECTANGLE for clean alignment
+   // 鉁?CORRECT: Use RECTANGLE for clean alignment
    slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
    slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
    ```
@@ -415,6 +415,6 @@ titleSlide.addText("My Title", { placeholder: "title" });
 
 - **Shapes**: RECTANGLE, OVAL, LINE, ROUNDED_RECTANGLE
 - **Charts**: BAR, LINE, PIE, DOUGHNUT, SCATTER, BUBBLE, RADAR
-- **Layouts**: LAYOUT_16x9 (10"×5.625"), LAYOUT_16x10, LAYOUT_4x3, LAYOUT_WIDE
+- **Layouts**: LAYOUT_16x9 (10"脳5.625"), LAYOUT_16x10, LAYOUT_4x3, LAYOUT_WIDE
 - **Alignment**: "left", "center", "right"
 - **Chart data labels**: "outEnd", "inEnd", "center"

@@ -11,22 +11,28 @@ license: Complete terms in LICENSE.txt
 
 ## 触发场景
 
-- 用户要求创建海报、艺术品、设计或其他静态视觉作品
+- 用户要求创建海报、艺术品、设计或�
+�他静态视觉作品
 - 需要原创视觉设计（非复制现有艺术家作品）
 - 输出为 .md、.pdf 或 .png 文件
 
 ---
 
-## 执行前必读
+## 执行前�
+读
 
-**决定使用此 skill 后，必须先读取 `canvas-design/GUIDE.md`**
+**决定使用此 skill 后，�
+须�
+�读取 `canvas-design/GUIDE.md`**
 
 **禁止事项**：
-- 不准偷懒不读取 skill 的其他详细文档
+- 不准偷懒不读取 skill 的�
+�他详细文档
 - 不准直接用 SKILL.md 中的精简格式给用户输出
 
 **输出要求**：
-- 输出开头必须列出：「已读取：SKILL.md、GUIDE.md」
+- 输出开头�
+须列出：「已读取：SKILL.md、GUIDE.md」
 
 ---
 
@@ -43,8 +49,10 @@ license: Complete terms in LICENSE.txt
 
 - 命名运动（1-2词）："Brutalist Joy" / "Chromatic Silence"
 - 阐述哲学（3-6段）：空间与形式、色彩与材质、尺度与节奏、构图与平衡
-- 强调工艺：必须反复强调作品应看起来由顶尖专家精心制作
-- 极简文字：90% 视觉设计 + 10% 必要文字
+- 强调工艺：�
+须反复强调作品应看起来由顶尖专家精心制作
+- 极简文字：90% 视觉设计 + 10% �
+要文字
 
 ---
 
@@ -53,4 +61,5 @@ license: Complete terms in LICENSE.txt
 - 设计哲学（.md 文件）
 - 视觉作品（.pdf 或 .png 文件）
 
-详细方法论请阅读：GUIDE.md
+详细方法论请�
+读：GUIDE.md

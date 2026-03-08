@@ -92,28 +92,28 @@ This file provides a curated catalog of available skills from multiple platforms
 ## Scenario-Based Recommendations
 
 ### "I need to analyze a document"
-1. **PDF** â†?`pdf` skill
-2. **Word** â†?`docx` skill
-3. **Excel** â†?`xlsx` skill
-4. **PowerPoint** â†?`pptx` skill
+1. **PDF** éˆ«?`pdf` skill
+2. **Word** éˆ«?`docx` skill
+3. **Excel** éˆ«?`xlsx` skill
+4. **PowerPoint** éˆ«?`pptx` skill
 
 ### "I need to search the web"
-1. **General search** â†?`tavily-search` or `exa-web-search-free`
-2. **Social media** â†?`twitter-search`
+1. **General search** éˆ«?`tavily-search` or `exa-web-search-free`
+2. **Social media** éˆ«?`twitter-search`
 
 ### "I need to handle financial data"
-1. **Chinese stocks** â†?`tushare-finance` or `china-stock-analysis`
-2. **General stocks** â†?`stock-market-pro`
+1. **Chinese stocks** éˆ«?`tushare-finance` or `china-stock-analysis`
+2. **General stocks** éˆ«?`stock-market-pro`
 
 ### "I need to automate browser tasks"
-â†?`agent-browser` skill
+éˆ«?`agent-browser` skill
 
 ### "I need to process video/audio"
-â†?`ffmpeg-video-editor` skill
+éˆ«?`ffmpeg-video-editor` skill
 
 ### "I need help with coding"
-1. **React/Next.js** â†?`vercel-react-best-practices`
-2. **General** â†?Search `npx skills find [technology]`
+1. **React/Next.js** éˆ«?`vercel-react-best-practices`
+2. **General** éˆ«?Search `npx skills find [technology]`
 
 ---
 

@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 from pydantic.alias_generators import to_camel
 from pydantic_settings import BaseSettings
 
@@ -352,31 +352,46 @@ class Config(BaseSettings):
     gateway: GatewayConfig = Field(default_factory=GatewayConfig)
     tools: ToolsConfig = Field(default_factory=ToolsConfig)
     shared: SharedConfig = Field(default_factory=SharedConfig)
+    _config_path: Path | None = PrivateAttr(default=None)
+
+    def bind_config_path(self, config_path: Path | None) -> "Config":
+        """Bind the source config path for resolving relative paths."""
+        self._config_path = config_path.expanduser().resolve() if config_path else None
+        return self
+
+    def _resolve_path(self, value: str) -> Path:
+        """Resolve config paths relative to the config file when appropriate."""
+        path = Path(value).expanduser()
+        if path.is_absolute():
+            return path
+        if self._config_path is not None:
+            return (self._config_path.parent / path).resolve()
+        return path
 
     @property
     def workspace_path(self) -> Path:
         """Get expanded workspace path."""
-        return Path(self.agents.defaults.workspace).expanduser()
+        return self._resolve_path(self.agents.defaults.workspace)
 
     @property
     def shared_skills_path(self) -> Path | None:
         """Get expanded shared skills path."""
         if self.shared.skills_path:
-            return Path(self.shared.skills_path).expanduser()
+            return self._resolve_path(self.shared.skills_path)
         return None
 
     @property
     def shared_memory_path(self) -> Path | None:
         """Get expanded shared memory path."""
         if self.shared.memory_path:
-            return Path(self.shared.memory_path).expanduser()
+            return self._resolve_path(self.shared.memory_path)
         return None
 
     @property
     def shared_learnings_path(self) -> Path | None:
         """Get expanded shared learnings path."""
         if self.shared.learnings_path:
-            return Path(self.shared.learnings_path).expanduser()
+            return self._resolve_path(self.shared.learnings_path)
         return None
 
     def _match_provider(

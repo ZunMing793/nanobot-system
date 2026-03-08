@@ -34,12 +34,12 @@ def load_config(config_path: Path | None = None) -> Config:
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
             data = _migrate_config(data)
-            return Config.model_validate(data)
+            return Config.model_validate(data).bind_config_path(path)
         except (json.JSONDecodeError, ValueError) as e:
             print(f"Warning: Failed to load config from {path}: {e}")
             print("Using default configuration.")
 
-    return Config()
+    return Config().bind_config_path(path)
 
 
 def save_config(config: Config, config_path: Path | None = None) -> None:

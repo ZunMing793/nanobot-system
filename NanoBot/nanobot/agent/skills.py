@@ -78,13 +78,13 @@ class SkillsLoader:
         if self.shared_skills:
             skill_file = self.shared_skills / name / "SKILL.md"
             if skill_file.exists():
-                return skill_file.read_text(encoding="utf-8")
+                return self._read_text_file(skill_file)
 
         # Then try builtin
         if self.builtin_skills:
             skill_file = self.builtin_skills / name / "SKILL.md"
             if skill_file.exists():
-                return skill_file.read_text(encoding="utf-8")
+                return self._read_text_file(skill_file)
 
         return None
 
@@ -102,13 +102,13 @@ class SkillsLoader:
         if self.shared_skills:
             guide_file = self.shared_skills / name / "GUIDE.md"
             if guide_file.exists():
-                return guide_file.read_text(encoding="utf-8")
+                return self._read_text_file(guide_file)
 
         # Then try builtin
         if self.builtin_skills:
             guide_file = self.builtin_skills / name / "GUIDE.md"
             if guide_file.exists():
-                return guide_file.read_text(encoding="utf-8")
+                return self._read_text_file(guide_file)
 
         return None
 
@@ -206,6 +206,15 @@ class SkillsLoader:
             if not os.environ.get(env):
                 missing.append(f"ENV: {env}")
         return ", ".join(missing)
+
+    def _read_text_file(self, path: Path) -> str:
+        """Read a skill file with a small set of safe encoding fallbacks."""
+        for encoding in ("utf-8", "utf-8-sig", "gb18030"):
+            try:
+                return path.read_text(encoding=encoding)
+            except UnicodeDecodeError:
+                continue
+        return path.read_text(encoding="utf-8", errors="replace")
 
     def _get_skill_description(self, name: str) -> str:
         """Get the description of a skill from its frontmatter."""

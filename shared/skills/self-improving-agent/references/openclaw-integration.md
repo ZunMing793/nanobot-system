@@ -10,20 +10,20 @@ OpenClaw uses workspace-based prompt injection combined with event-driven hooks.
 
 ```
 ~/.openclaw/                      
-├── workspace/                   # Working directory
-�?  ├── AGENTS.md               # Multi-agent coordination patterns
-�?  ├── SOUL.md                 # Behavioral guidelines and personality
-�?  ├── TOOLS.md                # Tool capabilities and gotchas
-�?  ├── MEMORY.md               # Long-term memory (main session only)
-�?  └── memory/                 # Daily memory files
-�?      └── YYYY-MM-DD.md
-├── skills/                      # Installed skills
-�?  └── <skill-name>/
-�?      └── SKILL.md
-└── hooks/                       # Custom hooks
-    └── <hook-name>/
-        ├── HOOK.md
-        └── handler.ts
+â”œâ”€â”€ workspace/                   # Working directory
+â”?  â”œâ”€â”€ AGENTS.md               # Multi-agent coordination patterns
+â”?  â”œâ”€â”€ SOUL.md                 # Behavioral guidelines and personality
+â”?  â”œâ”€â”€ TOOLS.md                # Tool capabilities and gotchas
+â”?  â”œâ”€â”€ MEMORY.md               # Long-term memory (main session only)
+â”?  â””â”€â”€ memory/                 # Daily memory files
+â”?      â””â”€â”€ YYYY-MM-DD.md
+â”œâ”€â”€ skills/                      # Installed skills
+â”?  â””â”€â”€ <skill-name>/
+â”?      â””â”€â”€ SKILL.md
+â””â”€â”€ hooks/                       # Custom hooks
+    â””â”€â”€ <hook-name>/
+        â”œâ”€â”€ HOOK.md
+        â””â”€â”€ handler.ts
 ```
 
 ## Quick Setup
@@ -134,12 +134,12 @@ Log learnings to `.learnings/` for continuous improvement.
 
 ```
 Is the learning project-specific?
-├── Yes �?Keep in .learnings/
-└── No �?Is it behavioral/style-related?
-    ├── Yes �?Promote to SOUL.md
-    └── No �?Is it tool-related?
-        ├── Yes �?Promote to TOOLS.md
-        └── No �?Promote to AGENTS.md (workflow)
+â”œâ”€â”€ Yes â†?Keep in .learnings/
+â””â”€â”€ No â†?Is it behavioral/style-related?
+    â”œâ”€â”€ Yes â†?Promote to SOUL.md
+    â””â”€â”€ No â†?Is it tool-related?
+        â”œâ”€â”€ Yes â†?Promote to TOOLS.md
+        â””â”€â”€ No â†?Promote to AGENTS.md (workflow)
 ```
 
 ### Promotion Format Examples

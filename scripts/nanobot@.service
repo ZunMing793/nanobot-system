@@ -1,0 +1,19 @@
+[Unit]
+Description=NanoBot gateway for %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/NanoBot/%i
+ExecStart=/home/NanoBot/.venv/bin/python -m nanobot gateway --config config.json
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=30
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
