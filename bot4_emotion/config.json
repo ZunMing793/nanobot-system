@@ -1,0 +1,30 @@
+{
+  "bot_id": "bot4_emotion",
+  "bot_name": "情感助理",
+  "bot_role": "worker",
+  "description": "情感助理 - 负责心理咨询、情绪支持、压力缓解、人际关系",
+
+  "agents": {
+    "defaults": {
+      "workspace": "./workspace",
+      "model": "glm-5",
+      "max_tokens": 4096,
+      "temperature": 0.3
+    }
+  },
+
+  "shared": {
+    "skills_path": "../shared/skills",
+    "memory_path": "../shared/memory",
+    "learnings_path": "../shared/learnings"
+  },
+
+  "channels": {
+    "qq": {
+      "enabled": true,
+      "app_id": "102857681",
+      "secret": "hSDzlYMAzoeULC4xqkeZUQMJGEDCCCDE",
+      "allow_from": ["*"]
+    }
+  }
+}

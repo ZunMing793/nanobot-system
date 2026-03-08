@@ -1,0 +1,30 @@
+{
+  "bot_id": "bot5_media",
+  "bot_name": "自媒体助理",
+  "bot_role": "worker",
+  "description": "自媒体助理 - 负责内容创作、平台运营、文案写作、数据分析",
+
+  "agents": {
+    "defaults": {
+      "workspace": "./workspace",
+      "model": "glm-5",
+      "max_tokens": 8192,
+      "temperature": 0.5
+    }
+  },
+
+  "shared": {
+    "skills_path": "../shared/skills",
+    "memory_path": "../shared/memory",
+    "learnings_path": "../shared/learnings"
+  },
+
+  "channels": {
+    "qq": {
+      "enabled": true,
+      "app_id": "102892046",
+      "secret": "0HYq8Rl5Ql7TqDbzOoEf6Y0TxRwRxT0X",
+      "allow_from": ["*"]
+    }
+  }
+}

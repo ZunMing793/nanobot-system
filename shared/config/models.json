@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "NanoBot 多Bot系统 - 共享模型配置文件",
+  
+  "providers": {
+    "nexus": {
+      "name": "Nexus",
+      "api_key": "sk-f50bd79c86a31abe04315194aa17ef75b22802fe48814a38",
+      "api_base": "https://nexusacc.itssx.com/api/claude_code/cc_glm",
+      "api_format": "anthropic"
+    },
+    "iflow": {
+      "name": "iFlow",
+      "api_key": "sk-e4b37e57b5cd92144312f0ce306d950c",
+      "api_base": "https://apis.iflow.cn/v1",
+      "api_format": "openai"
+    }
+  },
+
+  "models": {
+    "glm-5": {
+      "name": "GLM-5",
+      "model": "glm-5",
+      "provider": "nexus",
+      "context": 200000,
+      "max_output_tokens": 8192
+    },
+    "kimi-k2": {
+      "name": "Kimi K2",
+      "model": "kimi-k2-0905",
+      "provider": "iflow",
+      "context": 256000,
+      "max_output_tokens": 64000
+    }
+  },
+
+  "default_model": "glm-5",
+
+  "bot_overrides": {
+    "bot1_core": {
+      "model": "glm-5"
+    },
+    "bot2_health": {
+      "model": "glm-5"
+    },
+    "bot3_finance": {
+      "model": "glm-5"
+    },
+    "bot4_emotion": {
+      "model": "glm-5"
+    },
+    "bot5_media": {
+      "model": "glm-5"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "bot_id": "bot1_core",
+  "bot_name": "核心助理",
+  "bot_role": "leader",
+  "description": "核心助理 - 负责整体协调、任务分发、进程管理",
+
+  "agents": {
+    "defaults": {
+      "workspace": "./workspace",
+      "model": "glm-5",
+      "max_tokens": 8192,
+      "temperature": 0.1
+    }
+  },
+
+  "shared": {
+    "skills_path": "../shared/skills",
+    "memory_path": "../shared/memory",
+    "learnings_path": "../shared/learnings"
+  },
+
+  "channels": {
+    "qq": {
+      "enabled": true,
+      "app_id": "102844325",
+      "secret": "OnDe5X0TxRwSyV3bAjJuV7kN1fK0gN4m",
+      "allow_from": ["*"]
+    }
+  }
+}

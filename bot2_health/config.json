@@ -1,0 +1,30 @@
+{
+  "bot_id": "bot2_health",
+  "bot_name": "健康助理",
+  "bot_role": "worker",
+  "description": "健康助理 - 负责健康咨询、运动建议、饮食规划、睡眠改善",
+
+  "agents": {
+    "defaults": {
+      "workspace": "./workspace",
+      "model": "glm-5",
+      "max_tokens": 4096,
+      "temperature": 0.1
+    }
+  },
+
+  "shared": {
+    "skills_path": "../shared/skills",
+    "memory_path": "../shared/memory",
+    "learnings_path": "../shared/learnings"
+  },
+
+  "channels": {
+    "qq": {
+      "enabled": true,
+      "app_id": "102846091",
+      "secret": "VwNpIlFkFlIpNwV5fGsU7kO3iO4lSAsb",
+      "allow_from": ["*"]
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "bot_id": "bot3_finance",
+  "bot_name": "理财助理",
+  "bot_role": "worker",
+  "description": "理财助理 - 负责投资建议、资产配置、财务规划、风险评估",
+
+  "agents": {
+    "defaults": {
+      "workspace": "./workspace",
+      "model": "glm-5",
+      "max_tokens": 4096,
+      "temperature": 0.05
+    }
+  },
+
+  "shared": {
+    "skills_path": "../shared/skills",
+    "memory_path": "../shared/memory",
+    "learnings_path": "../shared/learnings"
+  },
+
+  "channels": {
+    "qq": {
+      "enabled": true,
+      "app_id": "102849806",
+      "secret": "GpOyY9lN0dHvaFvbIzhQ9tdO9vhUH5uj",
+      "allow_from": ["*"]
+    }
+  }
+}
