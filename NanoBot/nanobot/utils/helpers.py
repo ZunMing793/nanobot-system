@@ -96,13 +96,17 @@ def sync_workspace_templates(workspace: Path, silent: bool = False) -> list[str]
             return
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(src.read_text(encoding="utf-8") if src else "", encoding="utf-8")
-        added.append(str(dest.relative_to(workspace)))
+        added.append(dest.relative_to(workspace).as_posix())
 
     for item in tpl.iterdir():
         if item.name.endswith(".md"):
             _write(item, workspace / item.name)
     _write(tpl / "memory" / "MEMORY.md", workspace / "memory" / "MEMORY.md")
     _write(None, workspace / "memory" / "HISTORY.md")
+    _write(tpl / "learnings" / "LEARNINGS.md", workspace / ".learnings" / "LEARNINGS.md")
+    _write(tpl / "learnings" / "ERRORS.md", workspace / ".learnings" / "ERRORS.md")
+    _write(tpl / "self" / "SELF.md", workspace / "self" / "SELF.md")
+    _write(tpl / "user" / "PROFILE.md", workspace / "user" / "PROFILE.md")
     (workspace / "skills").mkdir(exist_ok=True)
 
     if added and not silent:

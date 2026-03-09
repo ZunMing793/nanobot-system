@@ -100,6 +100,7 @@ class AgentLoop:
             bot_root=self.bot_root,
             shared_skills_path=shared_skills_path,
             shared_learnings_path=shared_learnings_path,
+            shared_memory_path=shared_memory_path,
             builtin_skills_path=builtin_skills_path,
         )
         self.sessions = session_manager or SessionManager(workspace)
@@ -123,6 +124,7 @@ class AgentLoop:
             workspace=workspace,
             shared_learnings_path=shared_learnings_path,
             shared_memory_path=shared_memory_path,
+            bot_id=self.bot_id,
         )
 
         self.subagents = SubagentManager(
@@ -213,8 +215,67 @@ class AgentLoop:
             val = next(iter(args.values()), None) if isinstance(args, dict) else None
             if not isinstance(val, str):
                 return tc.name
-            return f'{tc.name}("{val[:40]}…")' if len(val) > 40 else f'{tc.name}("{val}")'
+            return f'{tc.name}("{val[:40]}...")' if len(val) > 40 else f'{tc.name}("{val}")'
         return ", ".join(_fmt(tc) for tc in tool_calls)
+
+    @staticmethod
+    def _looks_like_create_file_request(message: str) -> bool:
+        pattern = r"(创建|新建|生成|写入|保存).{0,24}(文件|\.[a-zA-Z0-9]{1,8})"
+        return bool(re.search(pattern, message))
+
+    @staticmethod
+    def _looks_like_edit_file_request(message: str) -> bool:
+        pattern = r"(修改|编辑|替换|改成|更新|追加).{0,24}(文件|\.[a-zA-Z0-9]{1,8})"
+        return bool(re.search(pattern, message))
+
+    @staticmethod
+    def _wants_title_only(message: str) -> bool:
+        phrases = (
+            "只回复标题",
+            "只要标题",
+            "仅返回标题",
+            "只给标题",
+        )
+        return any(phrase in message for phrase in phrases)
+
+    def _build_execution_hint(self, message: str) -> str | None:
+        hints: list[str] = []
+
+        if self._looks_like_create_file_request(message):
+            hints.append(
+                "If the user asks to create a brand-new file, prefer `write_file` directly instead of "
+                "stalling on `read_file`."
+            )
+
+        if self._looks_like_edit_file_request(message):
+            hints.append(
+                "If the user asks to modify an existing file and the target is already clear, prefer `edit_file`."
+            )
+
+        if "mp.weixin.qq.com" in message:
+            hints.append(
+                "For WeChat article pages, follow the agent-browser workflow via the `ab` wrapper: "
+                "`ab open <url>` then `ab snapshot`, then extract only the requested fields."
+            )
+            if self._wants_title_only(message):
+                hints.append("If the user asks for only the title, return only the title with no summary.")
+
+        if self.memory_learning.is_trigger_message(message):
+            hints.append(
+                "This message explicitly asks to record or update memory/experience. Do not repeat active "
+                "memory summarization in this turn."
+            )
+
+        if not hints:
+            return None
+        return "Turn routing hints:\n- " + "\n- ".join(hints)
+
+    def _get_allowed_tool_names(self, channel: str) -> set[str]:
+        """Return the tool names exposed for the current turn."""
+        allowed = set(self.tools.tool_names)
+        if channel == "cli":
+            allowed.discard("message")
+        return allowed
 
     async def _call_ai_for_command(self, prompt: str) -> str:
         """Call AI for command processing (used by CommandHandler)."""
@@ -279,6 +340,7 @@ class AgentLoop:
         self,
         initial_messages: list[dict],
         on_progress: Callable[..., Awaitable[None]] | None = None,
+        allowed_tool_names: set[str] | None = None,
     ) -> tuple[str | None, list[str], list[dict]]:
         """Run the agent iteration loop. Returns (final_content, tools_used, messages)."""
         messages = initial_messages
@@ -291,7 +353,7 @@ class AgentLoop:
 
             response = await self.provider.chat(
                 messages=messages,
-                tools=self.tools.get_definitions(),
+                tools=self.tools.get_definitions(include_names=allowed_tool_names),
                 model=self.model,
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
@@ -328,6 +390,7 @@ class AgentLoop:
                 messages = self.context.add_assistant_message(
                     messages, response.content, tool_call_dicts,
                     reasoning_content=response.reasoning_content,
+                    reasoning_details=response.reasoning_details,
                     thinking_blocks=response.thinking_blocks,
                 )
 
@@ -335,7 +398,13 @@ class AgentLoop:
                     tools_used.append(tool_call.name)
                     args_str = json.dumps(tool_call.arguments, ensure_ascii=False)
                     logger.info("Tool call: {}({})", tool_call.name, args_str[:200])
-                    result = await self.tools.execute(tool_call.name, tool_call.arguments)
+                    if allowed_tool_names is not None and tool_call.name not in allowed_tool_names:
+                        result = (
+                            f"Error: Tool '{tool_call.name}' is not available in the current channel. "
+                            "Reply directly instead of using it."
+                        )
+                    else:
+                        result = await self.tools.execute(tool_call.name, tool_call.arguments)
                     messages = self.context.add_tool_result(
                         messages, tool_call.id, tool_call.name, result
                     )
@@ -349,6 +418,7 @@ class AgentLoop:
                     break
                 messages = self.context.add_assistant_message(
                     messages, clean, reasoning_content=response.reasoning_content,
+                    reasoning_details=response.reasoning_details,
                     thinking_blocks=response.thinking_blocks,
                 )
                 final_content = clean
@@ -476,7 +546,9 @@ class AgentLoop:
                 history=history,
                 current_message=msg.content, channel=channel, chat_id=chat_id,
             )
-            final_content, _, all_msgs = await self._run_agent_loop(messages)
+            final_content, _, all_msgs = await self._run_agent_loop(
+                messages, allowed_tool_names=self._get_allowed_tool_names(channel)
+            )
             self._save_turn(session, all_msgs, 1 + len(history))
             self.sessions.save(session)
             return OutboundMessage(channel=channel, chat_id=chat_id,
@@ -546,11 +618,15 @@ class AgentLoop:
                 message_tool.start_turn()
 
         history = session.get_history(max_messages=self.memory_window)
+        allowed_tool_names = self._get_allowed_tool_names(msg.channel)
+        execution_hint = self._build_execution_hint(msg.content)
         initial_messages = self.context.build_messages(
             history=history,
             current_message=msg.content,
             media=msg.media if msg.media else None,
-            channel=msg.channel, chat_id=msg.chat_id,
+            channel=msg.channel,
+            chat_id=msg.chat_id,
+            execution_hint=execution_hint,
         )
 
         async def _bus_progress(content: str, *, tool_hint: bool = False) -> None:
@@ -562,7 +638,9 @@ class AgentLoop:
             ))
 
         final_content, _, all_msgs = await self._run_agent_loop(
-            initial_messages, on_progress=on_progress or _bus_progress,
+            initial_messages,
+            on_progress=on_progress or _bus_progress,
+            allowed_tool_names=allowed_tool_names,
         )
 
         if final_content is None:
@@ -574,29 +652,28 @@ class AgentLoop:
         if (mt := self.tools.get("message")) and isinstance(mt, MessageTool) and mt._sent_in_turn:
             return None
 
-        # Active mechanism: think and record memory/learning
-        try:
-            recorded = await self.memory_learning.think_and_record(
-                user_message=msg.content,
-                ai_response=final_content or "",
-                call_ai_func=self._call_ai_for_command,
-            )
-            if recorded:
-                logger.info(f"Auto-recorded: {recorded}")
-        except Exception as e:
-            logger.warning(f"Memory/learning auto-record failed: {e}")
-
-        # Passive mechanism: check for trigger keywords
-        if self.memory_learning.is_trigger_message(msg.content):
+        trigger_requested = self.memory_learning.is_trigger_message(msg.content)
+        if trigger_requested:
             try:
                 trigger_result = await self.memory_learning.record_on_trigger(
                     user_message=msg.content,
                     ai_response=final_content or "",
                     call_ai_func=self._call_ai_for_command,
                 )
-                logger.info(f"Trigger recording: {trigger_result}")
+                logger.info("Trigger recording: {}", trigger_result.get("summary", ""))
             except Exception as e:
                 logger.warning(f"Memory/learning trigger-record failed: {e}")
+        else:
+            try:
+                recorded = await self.memory_learning.think_and_record(
+                    user_message=msg.content,
+                    ai_response=final_content or "",
+                    call_ai_func=self._call_ai_for_command,
+                )
+                if recorded:
+                    logger.info("Auto-recorded: {}", recorded)
+            except Exception as e:
+                logger.warning(f"Memory/learning auto-record failed: {e}")
 
         preview = final_content[:120] + "..." if len(final_content) > 120 else final_content
         logger.info("Response to {}:{}: {}", msg.channel, msg.sender_id, preview)
@@ -616,18 +693,19 @@ class AgentLoop:
             if role == "tool" and isinstance(content, str) and len(content) > self._TOOL_RESULT_MAX_CHARS:
                 entry["content"] = content[:self._TOOL_RESULT_MAX_CHARS] + "\n... (truncated)"
             elif role == "user":
-                if isinstance(content, str) and content.startswith(ContextBuilder._RUNTIME_CONTEXT_TAG):
-                    # Strip the runtime-context prefix, keep only the user text.
-                    parts = content.split("\n\n", 1)
-                    if len(parts) > 1 and parts[1].strip():
-                        entry["content"] = parts[1]
-                    else:
+                if isinstance(content, str):
+                    stripped = ContextBuilder.strip_untrusted_context(content)
+                    if stripped is None:
                         continue
+                    entry["content"] = stripped
                 if isinstance(content, list):
                     filtered = []
                     for c in content:
-                        if c.get("type") == "text" and isinstance(c.get("text"), str) and c["text"].startswith(ContextBuilder._RUNTIME_CONTEXT_TAG):
-                            continue  # Strip runtime context from multimodal messages
+                        if c.get("type") == "text" and isinstance(c.get("text"), str):
+                            stripped_text = ContextBuilder.strip_untrusted_context(c["text"])
+                            if stripped_text is None:
+                                continue
+                            c = {**c, "text": stripped_text}
                         if (c.get("type") == "image_url"
                                 and c.get("image_url", {}).get("url", "").startswith("data:image/")):
                             filtered.append({"type": "text", "text": "[image]"})

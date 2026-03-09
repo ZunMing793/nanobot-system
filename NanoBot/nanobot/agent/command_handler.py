@@ -107,9 +107,10 @@ class CommandHandler:
 
         prompt = """请思考当前会话中是否有值得记录的内容：
 
-1. 用户画像信息（姓名、偏好、习惯等）→ 应更新到 MEMORY.md
-2. 有价值的经验（解决问题的方法、最佳实践）→ 应更新到 LEARNINGS.md  
-3. 共享价值的信息（其他 bot 也需要知道的）→ 应更新到 shared/learnings/SHARED.md
+1. 用户画像信息（姓名、偏好、习惯等）→ 应更新到 PROFILE.md
+2. 动态记忆（持续有效的重要背景、任务上下文）→ 应更新到 MEMORY.md
+3. 有价值的经验（解决问题的方法、最佳实践）→ 应更新到 LEARNINGS.md
+4. 共享价值的信息（其他 bot 也需要知道的）→ 应更新到 shared/learnings/SHARED.md 或 shared/memory/USER_PROFILE.md
 
 如果有，请记录。然后回复"已记录 X 条信息"或"无需记录"。
 简洁回复即可，不要展开。"""
@@ -171,9 +172,13 @@ class CommandHandler:
         if not self.call_ai:
             return "❌ 此命令需要 AI 支持"
 
+        profile_file = self.workspace / "user" / "PROFILE.md"
         memory_file = self.workspace / "memory" / "MEMORY.md"
 
         content = "请总结以下记忆内容：\n\n"
+
+        if profile_file.exists():
+            content += f"【私有用户画像】\n{profile_file.read_text()}\n\n"
 
         if memory_file.exists():
             content += f"【私有记忆】\n{memory_file.read_text()}\n\n"
@@ -330,8 +335,9 @@ class CommandHandler:
         log_file = bot_dir / "logs" / "bot.log"
         log_file.parent.mkdir(parents=True, exist_ok=True)
 
+        import sys
         process = subprocess.Popen(
-            ["python", "-m", "nanobot", "agent", "--config", "config.json"],
+            [sys.executable, "-m", "nanobot", "gateway", "--config", "config.json"],
             cwd=str(bot_dir),
             stdout=open(log_file, "w"),
             stderr=open(log_file.parent / "error.log", "w"),
