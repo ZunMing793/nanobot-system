@@ -1,6 +1,7 @@
 """File system tools: read, write, edit."""
 
 import difflib
+import os
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,65 @@ def _resolve_path(
         except ValueError:
             raise PermissionError(f"Path {path} is outside allowed directory {allowed_dir}")
     return resolved
+
+
+def build_protected_document_paths(
+    workspace: Path,
+    *,
+    shared_memory_path: Path | None = None,
+    shared_learnings_path: Path | None = None,
+    include_history: bool = False,
+) -> set[Path]:
+    """Build the set of system-managed knowledge document paths."""
+    protected = {
+        (workspace / "self" / "SELF.md").resolve(),
+        (workspace / "user" / "PROFILE.md").resolve(),
+        (workspace / "memory" / "MEMORY.md").resolve(),
+        (workspace / ".learnings" / "LEARNINGS.md").resolve(),
+        (workspace / ".learnings" / "ERRORS.md").resolve(),
+    }
+    if include_history:
+        protected.add((workspace / "memory" / "HISTORY.md").resolve())
+    if shared_memory_path:
+        protected.update(
+            {
+                (shared_memory_path / "USER_PROFILE.md").resolve(),
+                (shared_memory_path / "SHARED_KNOWLEDGE.md").resolve(),
+            }
+        )
+    if shared_learnings_path:
+        protected.add((shared_learnings_path / "SHARED.md").resolve())
+    return protected
+
+
+def _is_protected_document(file_path: Path, protected_paths: set[Path] | None) -> bool:
+    return bool(protected_paths and file_path.resolve() in protected_paths)
+
+
+def build_protected_exec_aliases(
+    workspace: Path,
+    protected_paths: set[Path] | None,
+) -> set[str]:
+    """Build absolute and workspace-relative aliases for protected documents."""
+    if not protected_paths:
+        return set()
+    workspace = workspace.resolve()
+    aliases: set[str] = set()
+    for path in protected_paths:
+        resolved = path.resolve()
+        aliases.add(resolved.as_posix())
+        aliases.add(str(resolved))
+        rel = os.path.relpath(resolved, workspace).replace("\\", "/")
+        aliases.add(rel)
+        aliases.add(f"./{rel}")
+    return {alias for alias in aliases if alias}
+
+
+def protected_document_error(path: str) -> str:
+    return (
+        "Error: Direct edits to system-managed memory documents are blocked: "
+        f"{path}. Use the bot's memory/learning pipeline instead."
+    )
 
 
 class ReadFileTool(Tool):
@@ -76,9 +136,15 @@ class ReadFileTool(Tool):
 class WriteFileTool(Tool):
     """Tool to write content to a file."""
 
-    def __init__(self, workspace: Path | None = None, allowed_dir: Path | None = None):
+    def __init__(
+        self,
+        workspace: Path | None = None,
+        allowed_dir: Path | None = None,
+        protected_paths: set[Path] | None = None,
+    ):
         self._workspace = workspace
         self._allowed_dir = allowed_dir
+        self._protected_paths = protected_paths or set()
 
     @property
     def name(self) -> str:
@@ -102,6 +168,8 @@ class WriteFileTool(Tool):
     async def execute(self, path: str, content: str, **kwargs: Any) -> str:
         try:
             file_path = _resolve_path(path, self._workspace, self._allowed_dir)
+            if _is_protected_document(file_path, self._protected_paths):
+                return protected_document_error(path)
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text(content, encoding="utf-8")
             return f"Successfully wrote {len(content)} bytes to {file_path}"
@@ -114,9 +182,15 @@ class WriteFileTool(Tool):
 class EditFileTool(Tool):
     """Tool to edit a file by replacing text."""
 
-    def __init__(self, workspace: Path | None = None, allowed_dir: Path | None = None):
+    def __init__(
+        self,
+        workspace: Path | None = None,
+        allowed_dir: Path | None = None,
+        protected_paths: set[Path] | None = None,
+    ):
         self._workspace = workspace
         self._allowed_dir = allowed_dir
+        self._protected_paths = protected_paths or set()
 
     @property
     def name(self) -> str:
@@ -143,6 +217,8 @@ class EditFileTool(Tool):
             file_path = _resolve_path(path, self._workspace, self._allowed_dir)
             if not file_path.exists():
                 return f"Error: File not found: {path}"
+            if _is_protected_document(file_path, self._protected_paths):
+                return protected_document_error(path)
 
             content = file_path.read_text(encoding="utf-8")
 

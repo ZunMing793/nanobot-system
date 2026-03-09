@@ -54,6 +54,14 @@ def test_low_value_entries_are_rejected(tmp_path) -> None:
     assert not manager.self_file.exists()
 
 
+def test_is_trigger_message_supports_english_keywords(tmp_path) -> None:
+    manager = MemoryLearningManager(_make_workspace(tmp_path))
+
+    assert manager.is_trigger_message("Please remember this for later.") is True
+    assert manager.is_trigger_message("Can you record this experience?") is True
+    assert manager.is_trigger_message("Hello there.") is False
+
+
 def test_record_shared_user_profile_writes_into_bot_section(tmp_path) -> None:
     workspace = _make_workspace(tmp_path)
     shared_memory = tmp_path / "shared" / "memory"

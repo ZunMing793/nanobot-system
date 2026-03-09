@@ -16,7 +16,14 @@ from nanobot.agent.context import ContextBuilder
 from nanobot.agent.memory import MemoryStore
 from nanobot.agent.subagent import SubagentManager
 from nanobot.agent.tools.cron import CronTool
-from nanobot.agent.tools.filesystem import EditFileTool, ListDirTool, ReadFileTool, WriteFileTool
+from nanobot.agent.tools.filesystem import (
+    EditFileTool,
+    ListDirTool,
+    ReadFileTool,
+    WriteFileTool,
+    build_protected_document_paths,
+    build_protected_exec_aliases,
+)
 from nanobot.agent.tools.message import MessageTool
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.agent.tools.shell import ExecTool
@@ -92,6 +99,7 @@ class AgentLoop:
         self.bot_id = bot_id or "nanobot"
         self.bot_root = bot_root or workspace.parent
         self.shared_memory_path = shared_memory_path
+        self.shared_learnings_path = shared_learnings_path
         self.models_config_path = models_config_path
         self.builtin_skills_path = builtin_skills_path
 
@@ -156,13 +164,27 @@ class AgentLoop:
     def _register_default_tools(self) -> None:
         """Register the default set of tools."""
         allowed_dir = self.workspace if self.restrict_to_workspace else None
-        for cls in (ReadFileTool, WriteFileTool, EditFileTool, ListDirTool):
+        protected_docs = build_protected_document_paths(
+            self.workspace,
+            shared_memory_path=self.shared_memory_path,
+            shared_learnings_path=self.shared_learnings_path,
+        )
+        for cls in (ReadFileTool, ListDirTool):
             self.tools.register(cls(workspace=self.workspace, allowed_dir=allowed_dir))
+        for cls in (WriteFileTool, EditFileTool):
+            self.tools.register(
+                cls(
+                    workspace=self.workspace,
+                    allowed_dir=allowed_dir,
+                    protected_paths=protected_docs,
+                )
+            )
         self.tools.register(ExecTool(
             working_dir=str(self.workspace),
             timeout=self.exec_config.timeout,
             restrict_to_workspace=self.restrict_to_workspace,
             path_append=self.exec_config.path_append,
+            protected_paths=build_protected_exec_aliases(self.workspace, protected_docs),
         ))
         self.tools.register(WebSearchTool(api_key=self.brave_api_key, proxy=self.web_proxy))
         self.tools.register(WebFetchTool(proxy=self.web_proxy))
@@ -217,6 +239,24 @@ class AgentLoop:
                 return tc.name
             return f'{tc.name}("{val[:40]}...")' if len(val) > 40 else f'{tc.name}("{val}")'
         return ", ".join(_fmt(tc) for tc in tool_calls)
+
+    @staticmethod
+    def _looks_like_recording_claim(text: str | None) -> bool:
+        if not text:
+            return False
+        lowered = text.lower()
+        claim_patterns = (
+            "已记录",
+            "已保存",
+            "已写入",
+            "记忆中",
+            "学习文件",
+            "recorded",
+            "saved",
+            "written",
+            "logged",
+        )
+        return any(pattern in lowered for pattern in claim_patterns)
 
     @staticmethod
     def _looks_like_create_file_request(message: str) -> bool:
@@ -661,6 +701,13 @@ class AgentLoop:
                     call_ai_func=self._call_ai_for_command,
                 )
                 logger.info("Trigger recording: {}", trigger_result.get("summary", ""))
+                summary = trigger_result.get("summary", "")
+                if summary:
+                    has_recorded = bool(trigger_result.get("recorded"))
+                    if not has_recorded and self._looks_like_recording_claim(final_content):
+                        final_content = summary
+                    elif summary not in (final_content or ""):
+                        final_content = f"{final_content}\n\n{summary}" if final_content else summary
             except Exception as e:
                 logger.warning(f"Memory/learning trigger-record failed: {e}")
         else:

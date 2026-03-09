@@ -149,6 +149,7 @@ Your workspace is at: {workspace_path}
 - If the user is clearly asking to create a brand-new file, you may use `write_file` directly.
 - After writing or editing a file, re-read it if accuracy matters.
 - If a tool call fails, analyze the error before retrying with a different approach.
+- Do NOT directly edit `self/SELF.md`, `user/PROFILE.md`, `memory/MEMORY.md`, `.learnings/LEARNINGS.md`, shared profile, or shared learnings with file or exec tools; those documents are system-managed.
 - Ask for clarification when the request is ambiguous.
 
 Reply directly with text for conversations. Only use the `message` tool to send to a specific chat channel."""

@@ -27,6 +27,12 @@ class MemoryLearningManager:
         "这个很重要",
         "下次注意",
         "以后要",
+        "remember this",
+        "remember that",
+        "record this",
+        "save this",
+        "note this",
+        "log this",
     ]
     DUPLICATE_SIMILARITY_THRESHOLD = 0.92
     MIN_CONTENT_LENGTH = {

@@ -1,6 +1,13 @@
+import asyncio
+from pathlib import Path
 from typing import Any
 
 from nanobot.agent.tools.base import Tool
+from nanobot.agent.tools.filesystem import (
+    EditFileTool,
+    WriteFileTool,
+    build_protected_document_paths,
+)
 from nanobot.agent.tools.registry import ToolRegistry
 from nanobot.agent.tools.shell import ExecTool
 
@@ -106,3 +113,57 @@ def test_exec_extract_absolute_paths_captures_posix_absolute_paths() -> None:
     paths = ExecTool._extract_absolute_paths(cmd)
     assert "/tmp/data.txt" in paths
     assert "/tmp/out.txt" in paths
+
+
+def test_write_file_blocks_protected_memory_documents(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    protected = build_protected_document_paths(workspace)
+    tool = WriteFileTool(workspace=workspace, protected_paths=protected)
+
+    result = asyncio.run(tool.execute("memory/MEMORY.md", "test"))
+
+    assert "system-managed memory documents" in result
+    assert not (workspace / "memory" / "MEMORY.md").exists()
+
+
+def test_edit_file_blocks_protected_memory_documents(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    target = workspace / "user" / "PROFILE.md"
+    target.parent.mkdir(parents=True)
+    target.write_text("hello", encoding="utf-8")
+    protected = build_protected_document_paths(workspace)
+    tool = EditFileTool(workspace=workspace, protected_paths=protected)
+
+    result = asyncio.run(tool.execute("user/PROFILE.md", "hello", "world"))
+
+    assert "system-managed memory documents" in result
+    assert target.read_text(encoding="utf-8") == "hello"
+
+
+def test_exec_blocks_protected_memory_documents(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    protected = build_protected_document_paths(workspace)
+    aliases = {str(path) for path in protected}
+    aliases.add("memory/MEMORY.md")
+    tool = ExecTool(working_dir=str(workspace), protected_paths=aliases)
+
+    result = tool._guard_command("cat memory/MEMORY.md", str(workspace))
+
+    assert result is not None
+    assert "system-managed memory documents" in result
+
+
+
+def test_registry_get_definitions_can_filter_tools() -> None:
+    reg = ToolRegistry()
+    reg.register(SampleTool())
+    all_defs = reg.get_definitions()
+    filtered_defs = reg.get_definitions(include_names={"sample"})
+    missing_defs = reg.get_definitions(include_names={"missing"})
+
+    assert len(all_defs) == 1
+    assert len(filtered_defs) == 1
+    assert filtered_defs[0]["function"]["name"] == "sample"
+    assert missing_defs == []
