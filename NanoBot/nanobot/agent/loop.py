@@ -404,10 +404,10 @@ class AgentLoop:
                 if on_progress:
                     thoughts = [
                         self._strip_think(response.content),
-                        response.reasoning_content,
+                        getattr(response, "reasoning_content", None),
                         *(
                             f"Thinking [{b.get('signature', '...')}]:\n{b.get('thought', '...')}"
-                            for b in (response.thinking_blocks or [])
+                            for b in (getattr(response, "thinking_blocks", None) or [])
                             if isinstance(b, dict) and "signature" in b
                         ),
                     ]
@@ -429,9 +429,9 @@ class AgentLoop:
                 ]
                 messages = self.context.add_assistant_message(
                     messages, response.content, tool_call_dicts,
-                    reasoning_content=response.reasoning_content,
-                    reasoning_details=response.reasoning_details,
-                    thinking_blocks=response.thinking_blocks,
+                    reasoning_content=getattr(response, "reasoning_content", None),
+                    reasoning_details=getattr(response, "reasoning_details", None),
+                    thinking_blocks=getattr(response, "thinking_blocks", None),
                 )
 
                 for tool_call in response.tool_calls:
@@ -457,9 +457,9 @@ class AgentLoop:
                     final_content = clean or "Sorry, I encountered an error calling the AI model."
                     break
                 messages = self.context.add_assistant_message(
-                    messages, clean, reasoning_content=response.reasoning_content,
-                    reasoning_details=response.reasoning_details,
-                    thinking_blocks=response.thinking_blocks,
+                    messages, clean, reasoning_content=getattr(response, "reasoning_content", None),
+                    reasoning_details=getattr(response, "reasoning_details", None),
+                    thinking_blocks=getattr(response, "thinking_blocks", None),
                 )
                 final_content = clean
                 break

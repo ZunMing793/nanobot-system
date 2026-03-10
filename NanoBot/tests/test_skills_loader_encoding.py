@@ -30,3 +30,23 @@ def test_load_skill_falls_back_to_utf8_replace_for_unknown_bytes(tmp_path):
     loader = SkillsLoader(workspace=workspace, shared_skills_path=skills_dir)
 
     assert "abc" in loader.load_skill("broken-demo")
+
+
+def test_load_skill_rewrites_legacy_claude_skill_paths(tmp_path):
+    workspace = tmp_path / "workspace"
+    skills_dir = tmp_path / "skills"
+    skill_dir = skills_dir / "agent-browser"
+    skill_dir.mkdir(parents=True)
+    workspace.mkdir()
+
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: agent-browser\n---\n`C:/Users/79345/.claude/skills/agent-browser/GUIDE.md`\n",
+        encoding="utf-8",
+    )
+
+    loader = SkillsLoader(workspace=workspace, shared_skills_path=skills_dir)
+    content = loader.load_skill("agent-browser")
+
+    assert content is not None
+    assert f"`{skills_dir.as_posix()}/agent-browser/GUIDE.md`" in content
+    assert "C:/Users/79345/.claude/skills/agent-browser/GUIDE.md" not in content

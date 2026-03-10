@@ -190,6 +190,7 @@ class AzureOpenAIProvider(LLMProvider):
                 }
 
             reasoning_content = message.get("reasoning_content") or None
+            reasoning_details = message.get("reasoning_details") or None
 
             return LLMResponse(
                 content=message.get("content"),
@@ -197,6 +198,7 @@ class AzureOpenAIProvider(LLMProvider):
                 finish_reason=choice.get("finish_reason", "stop"),
                 usage=usage,
                 reasoning_content=reasoning_content,
+                reasoning_details=reasoning_details,
             )
 
         except (KeyError, IndexError) as e:

@@ -1,5 +1,6 @@
 """Test Azure OpenAI provider implementation (updated for model-based deployment names)."""
 
+import asyncio
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -150,8 +151,7 @@ def test_prepare_request_payload_sanitizes_messages():
     ]
 
 
-@pytest.mark.asyncio
-async def test_chat_success():
+def test_chat_success():
     """Test successful chat request using model as deployment name."""
     provider = AzureOpenAIProvider(
         api_key="test-key",
@@ -186,7 +186,7 @@ async def test_chat_success():
         
         # Test with specific model (deployment name)
         messages = [{"role": "user", "content": "Hello"}]
-        result = await provider.chat(messages, model="custom-deployment")
+        result = asyncio.run(provider.chat(messages, model="custom-deployment"))
         
         assert isinstance(result, LLMResponse)
         assert result.content == "Hello! How can I help you today?"
@@ -201,8 +201,7 @@ async def test_chat_success():
         assert call_args[0][0] == expected_url
 
 
-@pytest.mark.asyncio
-async def test_chat_uses_default_model_when_no_model_provided():
+def test_chat_uses_default_model_when_no_model_provided():
     """Test that chat uses default_model when no model is specified."""
     provider = AzureOpenAIProvider(
         api_key="test-key",
@@ -228,7 +227,7 @@ async def test_chat_uses_default_model_when_no_model_provided():
         mock_client.return_value.__aenter__.return_value = mock_context
         
         messages = [{"role": "user", "content": "Test"}]
-        await provider.chat(messages)  # No model specified
+        asyncio.run(provider.chat(messages))  # No model specified
         
         # Verify URL was built with default model as deployment name
         call_args = mock_context.post.call_args
@@ -236,8 +235,7 @@ async def test_chat_uses_default_model_when_no_model_provided():
         assert call_args[0][0] == expected_url
 
 
-@pytest.mark.asyncio
-async def test_chat_with_tool_calls():
+def test_chat_with_tool_calls():
     """Test chat request with tool calls in response."""
     provider = AzureOpenAIProvider(
         api_key="test-key",
@@ -279,7 +277,7 @@ async def test_chat_with_tool_calls():
         
         messages = [{"role": "user", "content": "What's the weather?"}]
         tools = [{"type": "function", "function": {"name": "get_weather", "parameters": {}}}]
-        result = await provider.chat(messages, tools=tools, model="weather-model")
+        result = asyncio.run(provider.chat(messages, tools=tools, model="weather-model"))
         
         assert isinstance(result, LLMResponse)
         assert result.content is None
@@ -289,8 +287,7 @@ async def test_chat_with_tool_calls():
         assert result.tool_calls[0].arguments == {"location": "San Francisco"}
 
 
-@pytest.mark.asyncio
-async def test_chat_api_error():
+def test_chat_api_error():
     """Test chat request API error handling."""
     provider = AzureOpenAIProvider(
         api_key="test-key",
@@ -308,7 +305,7 @@ async def test_chat_api_error():
         mock_client.return_value.__aenter__.return_value = mock_context
         
         messages = [{"role": "user", "content": "Hello"}]
-        result = await provider.chat(messages)
+        result = asyncio.run(provider.chat(messages))
         
         assert isinstance(result, LLMResponse)
         assert "Azure OpenAI API Error 401" in result.content
@@ -316,8 +313,7 @@ async def test_chat_api_error():
         assert result.finish_reason == "error"
 
 
-@pytest.mark.asyncio
-async def test_chat_connection_error():
+def test_chat_connection_error():
     """Test chat request connection error handling."""
     provider = AzureOpenAIProvider(
         api_key="test-key",
@@ -331,7 +327,7 @@ async def test_chat_connection_error():
         mock_client.return_value.__aenter__.return_value = mock_context
         
         messages = [{"role": "user", "content": "Hello"}]
-        result = await provider.chat(messages)
+        result = asyncio.run(provider.chat(messages))
         
         assert isinstance(result, LLMResponse)
         assert "Error calling Azure OpenAI: Exception('Connection failed')" in result.content
@@ -353,6 +349,33 @@ def test_parse_response_malformed():
     assert isinstance(result, LLMResponse)
     assert "Error parsing Azure OpenAI response" in result.content
     assert result.finish_reason == "error"
+
+
+def test_parse_response_preserves_reasoning_metadata():
+    """Test Azure response parsing keeps reasoning fields when present."""
+    provider = AzureOpenAIProvider(
+        api_key="test-key",
+        api_base="https://test-resource.openai.azure.com",
+        default_model="gpt-4o",
+    )
+
+    response = {
+        "choices": [{
+            "message": {
+                "content": "Done",
+                "role": "assistant",
+                "reasoning_content": "brief reasoning summary",
+                "reasoning_details": [{"type": "summary", "text": "step 1"}],
+            },
+            "finish_reason": "stop",
+        }],
+        "usage": {"prompt_tokens": 3, "completion_tokens": 4, "total_tokens": 7},
+    }
+
+    result = provider._parse_response(response)
+
+    assert result.reasoning_content == "brief reasoning summary"
+    assert result.reasoning_details == [{"type": "summary", "text": "step 1"}]
 
 
 def test_get_default_model():

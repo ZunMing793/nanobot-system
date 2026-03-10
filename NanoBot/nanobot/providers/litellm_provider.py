@@ -327,6 +327,7 @@ class LiteLLMProvider(LLMProvider):
             }
 
         reasoning_content = getattr(message, "reasoning_content", None) or None
+        reasoning_details = getattr(message, "reasoning_details", None) or None
         thinking_blocks = getattr(message, "thinking_blocks", None) or None
 
         return LLMResponse(
@@ -335,6 +336,7 @@ class LiteLLMProvider(LLMProvider):
             finish_reason=finish_reason or "stop",
             usage=usage,
             reasoning_content=reasoning_content,
+            reasoning_details=reasoning_details,
             thinking_blocks=thinking_blocks,
         )
 

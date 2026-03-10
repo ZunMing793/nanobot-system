@@ -209,12 +209,38 @@ class SkillsLoader:
 
     def _read_text_file(self, path: Path) -> str:
         """Read a skill file with a small set of safe encoding fallbacks."""
+        content = None
         for encoding in ("utf-8", "utf-8-sig", "gb18030"):
             try:
-                return path.read_text(encoding=encoding)
+                content = path.read_text(encoding=encoding)
+                break
             except UnicodeDecodeError:
                 continue
-        return path.read_text(encoding="utf-8", errors="replace")
+        if content is None:
+            content = path.read_text(encoding="utf-8", errors="replace")
+        return self._normalize_legacy_skill_paths(content, path)
+
+    def _normalize_legacy_skill_paths(self, content: str, path: Path) -> str:
+        """Rewrite hard-coded local Claude skill paths to the current runtime skill root."""
+        legacy_root_pattern = r"C:(?:/|\\)Users(?:/|\\)79345(?:/|\\)\.claude(?:/|\\)skills"
+        actual_root = self._resolve_skill_root(path)
+        if not actual_root:
+            return content
+        return re.sub(legacy_root_pattern, actual_root, content, flags=re.IGNORECASE)
+
+    def _resolve_skill_root(self, path: Path) -> str | None:
+        """Return the current runtime root for the given skill file."""
+        resolved = path.resolve()
+        for root in (self.shared_skills, self.builtin_skills):
+            if not root:
+                continue
+            root_resolved = root.resolve()
+            try:
+                resolved.relative_to(root_resolved)
+                return root_resolved.as_posix()
+            except ValueError:
+                continue
+        return None
 
     def _get_skill_description(self, name: str) -> str:
         """Get the description of a skill from its frontmatter."""

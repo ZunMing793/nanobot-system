@@ -1,5 +1,6 @@
 """Tool registry for dynamic tool management."""
 
+from collections.abc import Iterable
 from typing import Any
 
 from nanobot.agent.tools.base import Tool
@@ -31,9 +32,17 @@ class ToolRegistry:
         """Check if a tool is registered."""
         return name in self._tools
 
-    def get_definitions(self) -> list[dict[str, Any]]:
-        """Get all tool definitions in OpenAI format."""
-        return [tool.to_schema() for tool in self._tools.values()]
+    def get_definitions(
+        self,
+        include_names: Iterable[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get tool definitions in OpenAI format, optionally filtered by tool name."""
+        allowed_names = set(include_names) if include_names is not None else None
+        return [
+            tool.to_schema()
+            for name, tool in self._tools.items()
+            if allowed_names is None or name in allowed_names
+        ]
 
     async def execute(self, name: str, params: dict[str, Any]) -> str:
         """Execute a tool by name with given parameters."""
