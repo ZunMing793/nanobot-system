@@ -7,21 +7,17 @@ allowed-tools:
   - Read
 ---
 
-## 执行前�
-读
+## ⚠️ 执行前必读
 
-**决定使用此 skill 后，�
-须�
-�读取 `pdf/GUIDE.md`**
+**决定使用此 skill 后，必须先读取**：
+`C:/Users/79345/.claude/skills/pdf/GUIDE.md`
 
 **禁止事项**：
-- 不准偷懒不读取 skill 的�
-�他详细文档
-- 不准直接用 SKILL.md 中的精简格式给用户输出
+- ❌ 不准偷懒不读取 skill 的其他详细文件
+- ❌ 不准直接用 SKILL.md 中的精简格式给用户输出
 
 **输出要求**：
-- 输出开头�
-须列出：「已读取：SKILL.md、GUIDE.md」
+- 输出开头必须列出：「已读取：SKILL.md、GUIDE.md」
 
 ## 触发场景
 
@@ -30,12 +26,9 @@ allowed-tools:
 - 用户想要合并或拆分多个 PDF 文件
 - 用户想要旋转 PDF 页面或添加水印
 - 用户想要创建新的 PDF 文件
-- 用户需要填写 PDF 表单（需�
-读 FORMS.md）
+- 用户需要填充 PDF 表单（需阅读 FORMS.md）
 - 用户需要 OCR 处理扫描版 PDF
 
 ## 详细指南索引
 
-完整�
-容请�
-读：GUIDE.md
+完整内容请阅读：GUIDE.md

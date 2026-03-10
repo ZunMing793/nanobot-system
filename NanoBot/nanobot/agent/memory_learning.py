@@ -189,26 +189,26 @@ class MemoryLearningManager:
         call_ai_func: Any,
     ) -> dict[str, str]:
         """Actively summarize and record useful profile facts or learnings."""
-        prompt = f"""请分析以下对话，判断是否值得沉淀到长期文档。
+        prompt = f"""请分析以下对话,判断是否值得沉淀到长期文档。
 
 【用户消息】{user_message}
 
 【AI 回复】{ai_response}
 
-只有在内容满足“未来仍然有价值、足够具体、不是空话或一次性信息”时才记录。
-以下内容宁可不记，也不要滥记：
+只有在内容满足"未来仍然有价值、足够具体、不是空话或一次性信息"时才记录。
+以下内容宁可不记,也不要滥记:
 - 当前这一次对话里的临时安排、礼貌用语、寒暄
-- “这个很重要”“下次注意”这类空泛句子
+- "这个很重要""下次注意"这类空泛句子
 - 没有主体、条件、结论的泛泛总结
 - 纯粹重复已有常识或模板文字
 
-请严格判断以下 4 类：
-1. `self_cognition`：是否出现了值得长期保留的 bot 自我定位、职责边界、工作原则？
-2. `user_profile`：是否出现了稳定的用户画像（姓名、偏好、习惯、长期目标、约束等）？
-3. `learning`：是否出现了可复用的解决问题经验？必须具体到“什么场景下，怎么做，为什么有效/要避免什么”。
-4. `shared`：是否出现了其他 bot 也应该知道的共享经验？只有跨 bot 普适时才记录。
+请严格判断以下 4 类:
+1. `self_cognition`:是否出现了值得长期保留的 bot 自我定位、职责边界、工作原则?
+2. `user_profile`:是否出现了稳定的用户画像(姓名、偏好、习惯、长期目标、约束等)?
+3. `learning`:是否出现了可复用的解决问题经验?必须具体到"什么场景下,怎么做,为什么有效/要避免什么"。
+4. `shared`:是否出现了其他 bot 也应该知道的共享经验?只有跨 bot 普适时才记录。
 
-请只返回 JSON，对没有高价值内容的字段填 null，格式如下：
+请只返回 JSON,对没有高价值内容的字段填 null,格式如下:
 {{"self_cognition": null, "user_profile": null, "learning": null, "shared": null}}
 """
 
@@ -250,22 +250,22 @@ class MemoryLearningManager:
         call_ai_func: Any,
     ) -> dict[str, Any]:
         """Passively record user profile or learning when explicitly requested."""
-        prompt = f"""用户要求记录以下对话内容：
+        prompt = f"""用户要求记录以下对话内容:
 【用户消息】{user_message}
 
 【AI 回复】{ai_response}
 
-即使用户主动要求“记录”，你也必须先判断是否真的值得写入长期文档。
-如果内容只是临时事项、空话、寒暄、重复、没有长期价值，请不要记录。
+即使用户主动要求"记录",你也必须先判断是否真的值得写入长期文档。
+如果内容只是临时事项、空话、寒暄、重复、没有长期价值,请不要记录。
 
-请判断应该记录到哪里：
-1. 自我认知（bot 的职责、边界、工作原则）→ 返回 `self: 内容`
-2. 用户画像（用户个人信息、偏好、习惯、长期目标）→ 返回 `memory: 内容`
-3. 学习经验（解决问题的方法、最佳实践）→ 返回 `learning: 内容`
-4. 共享经验（其他 bot 也应该知道的经验）→ 返回 `shared: 内容`
+请判断应该记录到哪里:
+1. 自我认知(bot 的职责、边界、工作原则)→ 返回 `self: 内容`
+2. 用户画像(用户个人信息、偏好、习惯、长期目标)→ 返回 `memory: 内容`
+3. 学习经验(解决问题的方法、最佳实践)→ 返回 `learning: 内容`
+4. 共享经验(其他 bot 也应该知道的经验)→ 返回 `shared: 内容`
 
-可以同时记录多个项目，每行一个。
-如果没有高价值内容可记录，只返回 `none`。
+可以同时记录多个项目,每行一个。
+如果没有高价值内容可记录,只返回 `none`。
 不要输出解释。
 """
 
@@ -345,7 +345,7 @@ class MemoryLearningManager:
             return {
                 "recorded": {},
                 "skipped": {},
-                "summary": f"❌ 记录失败：{exc}",
+                "summary": f"❌ 记录失败:{exc}",
             }
 
     @staticmethod
@@ -436,7 +436,7 @@ class MemoryLearningManager:
         entry_id = now().strftime("%Y%m%d-%H%M%S")
         entry = (
             f"\n## [LRN-{entry_id}] 经验\n\n"
-            f"**来源**：{source} | **日期**：{timestamp}\n\n"
+            f"**来源**:{source} | **日期**:{timestamp}\n\n"
             f"{content}\n\n---\n"
         )
         if not self.learnings_file.exists():
@@ -465,7 +465,7 @@ class MemoryLearningManager:
         entry_id = now().strftime("%Y%m%d-%H%M%S")
         entry = (
             f"\n## [SHARED-{entry_id}] 共享经验\n\n"
-            f"**日期**：{timestamp}\n\n"
+            f"**日期**:{timestamp}\n\n"
             f"{content}\n\n---\n"
         )
         if not self.shared_learnings_file.exists():
@@ -510,11 +510,28 @@ class MemoryLearningManager:
 
     @staticmethod
     def _normalize_text(text: str) -> str:
-        normalized = re.sub(r"\s+", " ", text).strip().lower()
-        normalized = normalized.replace("：", ":")
-        normalized = normalized.replace("“", '"').replace("”", '"')
-        normalized = normalized.replace("‘", "'").replace("’", "'")
-        return normalized
+        normalized = text.replace("\r\n", "\n").replace("\r", "\n").strip().lower()
+        normalized = normalized.replace(":", ":")
+        normalized = normalized.replace(""", '"').replace(""", '"')
+        normalized = normalized.replace("'", "'").replace("'", "'")
+        normalized = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", normalized)
+        normalized = normalized.replace("`", "")
+
+        cleaned_lines: list[str] = []
+        for raw_line in normalized.splitlines():
+            line = raw_line.strip()
+            line = re.sub(r"^#{1,6}\s*", "", line)
+            line = re.sub(r"^[-*+•]+\s*", "", line)
+            line = re.sub(r"^\d+\s*[\.\)、::-]\s*", "", line)
+            line = re.sub(r"^\[[ xX]\]\s*", "", line)
+            line = re.sub(r"[*_~]+", "", line)
+            if line:
+                cleaned_lines.append(line)
+
+        normalized = " ".join(cleaned_lines)
+        normalized = re.sub(r"[\"']", "", normalized)
+        normalized = re.sub(r"[^\w\u4e00-\u9fff]+", " ", normalized)
+        return re.sub(r"\s+", " ", normalized).strip()
 
     def _contains_duplicate_text(self, text: str, content: str, *, kind: str) -> bool:
         candidate = self._normalize_text(content)
@@ -576,7 +593,7 @@ class MemoryLearningManager:
             if not stripped or stripped.lower() == "none":
                 continue
             match = re.match(
-                r"^(memory|profile|self|learning|shared)\s*[:：]\s*(.+)$",
+                r"^(memory|profile|self|learning|shared)\s*[::]\s*(.+)$",
                 stripped,
                 re.IGNORECASE,
             )
@@ -648,7 +665,7 @@ class MemoryLearningManager:
         }
         lines: list[str] = []
         for category, content in recorded.items():
-            lines.append(f"✅ 已记录{labels[category]}：{content}")
+            lines.append(f"✅ 已记录{labels[category]}:{content}")
         for category, reason in skipped.items():
             if reason == "low_value":
                 lines.append(f"⚪ 跳过低价值{labels[category]}")

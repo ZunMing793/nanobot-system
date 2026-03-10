@@ -1,6 +1,5 @@
+import asyncio
 from pathlib import Path
-
-import pytest
 
 from nanobot.agent.memory_learning import MemoryLearningManager
 
@@ -71,23 +70,23 @@ def test_record_shared_user_profile_writes_into_bot_section(tmp_path) -> None:
 
 ## 基本信息
 <!-- 由 bot1_core 维护 -->
-- **姓名**：
+- **姓名**:
 
 ## 健康档案
 <!-- 由 bot2_health 维护 -->
-- **身高体重**：
+- **身高体重**:
 
 ## 财务状况
 <!-- 由 bot3_finance 维护 -->
-- **收入水平**：
+- **收支水平**:
 
 ## 心理状态
 <!-- 由 bot4_emotion 维护 -->
-- **性格特点**：
+- **性格特点**:
 
 ## 自媒体运营
 <!-- 由 bot5_media 维护 -->
-- **平台账号**：
+- **平台账号**:
 
 ## 更新日志
 """,
@@ -99,17 +98,17 @@ def test_record_shared_user_profile_writes_into_bot_section(tmp_path) -> None:
         bot_id="bot1_core",
     )
 
-    assert manager._record_shared_user_profile("用户偏好简洁回复。", "user_profile") is True
-    assert manager._record_shared_user_profile("用户偏好简洁回复。", "user_profile") is False
+    content_line = "用户偏好简洁回复。"
+    assert manager._record_shared_user_profile(content_line, "user_profile") is True
+    assert manager._record_shared_user_profile(content_line, "user_profile") is False
 
     content = (shared_memory / "USER_PROFILE.md").read_text(encoding="utf-8")
     assert "## 基本信息" in content
-    assert "用户偏好简洁回复。" in content
-    assert content.count("用户偏好简洁回复。") == 1
+    assert content_line in content
+    assert content.count(content_line) == 1
 
 
-@pytest.mark.asyncio
-async def test_record_on_trigger_marks_duplicates_as_skipped(tmp_path) -> None:
+def test_record_on_trigger_marks_duplicates_as_skipped(tmp_path) -> None:
     manager = MemoryLearningManager(_make_workspace(tmp_path))
 
     async def fake_ai(_: str) -> str:
@@ -118,8 +117,8 @@ async def test_record_on_trigger_marks_duplicates_as_skipped(tmp_path) -> None:
             "learning: Use ab open before ab snapshot."
         )
 
-    first = await manager.record_on_trigger("\u8bb0\u4e0b\u6765\uff1a...", "", fake_ai)
-    second = await manager.record_on_trigger("\u8bb0\u4e0b\u6765\uff1a...", "", fake_ai)
+    first = asyncio.run(manager.record_on_trigger("记下来：...", "", fake_ai))
+    second = asyncio.run(manager.record_on_trigger("记下来：...", "", fake_ai))
 
     assert first["recorded"] == {
         "memory": "User likes concise replies.",
@@ -135,8 +134,7 @@ async def test_record_on_trigger_marks_duplicates_as_skipped(tmp_path) -> None:
     assert "User likes concise replies." in profile
 
 
-@pytest.mark.asyncio
-async def test_record_on_trigger_skips_low_value_entries(tmp_path) -> None:
+def test_record_on_trigger_skips_low_value_entries(tmp_path) -> None:
     manager = MemoryLearningManager(_make_workspace(tmp_path))
 
     async def fake_ai(_: str) -> str:
@@ -146,7 +144,7 @@ async def test_record_on_trigger_skips_low_value_entries(tmp_path) -> None:
             "learning: 下次注意"
         )
 
-    result = await manager.record_on_trigger("记下来", "", fake_ai)
+    result = asyncio.run(manager.record_on_trigger("记下来", "", fake_ai))
 
     assert result["recorded"] == {}
     assert result["skipped"] == {
@@ -155,3 +153,30 @@ async def test_record_on_trigger_skips_low_value_entries(tmp_path) -> None:
         "learning": "low_value",
     }
     assert "跳过低价值自我认知" in result["summary"]
+
+
+def test_record_user_profile_skips_markdown_variant_duplicates(tmp_path) -> None:
+    manager = MemoryLearningManager(_make_workspace(tmp_path))
+
+    assert manager._record_user_profile("User prefers concise replies.", "user_profile") is True
+    assert manager._record_user_profile("- **User prefers concise replies.**", "user_profile") is False
+
+    content = manager.profile_file.read_text(encoding="utf-8")
+    assert content.count("User prefers concise replies.") == 1
+
+
+def test_record_learning_skips_numbered_variant_duplicates(tmp_path) -> None:
+    manager = MemoryLearningManager(_make_workspace(tmp_path))
+
+    content = "Use ab open before ab snapshot to inspect the page first."
+    assert manager._record_learning(content, "learning") is True
+    assert (
+        manager._record_learning(
+            "1. Use `ab open` before `ab snapshot` to inspect the page first.",
+            "learning",
+        )
+        is False
+    )
+
+    saved = manager.learnings_file.read_text(encoding="utf-8")
+    assert saved.count("Use ab open before ab snapshot to inspect the page first.") == 1

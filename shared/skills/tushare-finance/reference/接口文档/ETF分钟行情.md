@@ -1,151 +1,152 @@
-# ETFåéè¡æ
+# ETF分钟行情
 
-**ææ¡£ID**: 387
-**åå§é¾æ¥**: https://tushare.pro/document/2?doc_id=387
+**文档ID**: 387
+**原始链接**: https://tushare.pro/document/2?doc_id=387
 
 ---
 
-## ETFåå²åéè¡æ
+## ETF历史分钟行情
 
-æ¥å£ï¼stk_minsæè¿°ï¼è·åETFåéæ°æ®ï¼æ¯æ?min/5min/15min/30min/60minè¡æï¼æä¾Python SDKå?http Restful APIä¸¤ç§æ¹å¼ééï¼åæ¬¡æå¤?000è¡æ°æ®ï¼å¯ä»¥éè¿è¡ç¥¨ä»£ç åæ¶é´å¾ªç¯è·åï¼æ¬æ¥å£å¯ä»¥æä¾è¶è¿?0å¹´ETFåå²åéæ°æ®æéï¼æ­£å¼æéè¯·åéæéè¯´æ
+接口：stk_mins描述：获取ETF分钟数据，支持1min/5min/15min/30min/60min行情，提供Python SDK和 http Restful API两种方式限量：单次最大8000行数据，可以通过股票代码和时间循环获取，本接口可以提供超过10年ETF历史分钟数据权限：正式权限请参阅权限说明
 
-è¾å¥åæ°
+输入参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>å¿é?/th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>必选</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>ts_code</td>
 <td>str</td>
 <td>Y</td>
-<td>ETFä»£ç ï¼e.g. 159001.SZ</td>
+<td>ETF代码，e.g. 159001.SZ</td>
 </tr>
 <tr>
 <td>freq</td>
 <td>str</td>
 <td>Y</td>
-<td>åéé¢åº¦ï¼?min/5min/15min/30min/60minï¼?/td>
+<td>分钟频度（1min/5min/15min/30min/60min）</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>datetime</td>
 <td>N</td>
-<td>å¼å§æ¥æ?æ ¼å¼ï¼?025-06-01 09:00:00</td>
+<td>开始日期 格式：2025-06-01 09:00:00</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>datetime</td>
 <td>N</td>
-<td>ç»ææ¶é´ æ ¼å¼ï¼?025-06-20 19:00:00</td>
+<td>结束时间 格式：2025-06-20 19:00:00</td>
 </tr>
 </tbody></table>
-freqåæ°è¯´æ
+freq参数说明
 
 <table>
 <thead>
 <tr>
 <th>freq</th>
-<th>è¯´æ</th>
+<th>说明</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>1min</td>
-<td>1åé</td>
+<td>1分钟</td>
 </tr>
 <tr>
 <td>5min</td>
-<td>5åé</td>
+<td>5分钟</td>
 </tr>
 <tr>
 <td>15min</td>
-<td>15åé</td>
+<td>15分钟</td>
 </tr>
 <tr>
 <td>30min</td>
-<td>30åé</td>
+<td>30分钟</td>
 </tr>
 <tr>
 <td>60min</td>
-<td>60åé</td>
+<td>60分钟</td>
 </tr>
 </tbody></table>
-è¾åºåæ°
+输出参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>é»è®¤æ¾ç¤º</th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>默认显示</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>ts_code</td>
 <td>str</td>
 <td>Y</td>
-<td>ETFä»£ç </td>
+<td>ETF代码</td>
 </tr>
 <tr>
 <td>trade_time</td>
 <td>str</td>
 <td>Y</td>
-<td>äº¤ææ¶é´</td>
+<td>交易时间</td>
 </tr>
 <tr>
 <td>open</td>
 <td>float</td>
 <td>Y</td>
-<td>å¼çä»·</td>
+<td>开盘价</td>
 </tr>
 <tr>
 <td>close</td>
 <td>float</td>
 <td>Y</td>
-<td>æ¶çä»?/td>
+<td>收盘价</td>
 </tr>
 <tr>
 <td>high</td>
 <td>float</td>
 <td>Y</td>
-<td>æé«ä»·</td>
+<td>最高价</td>
 </tr>
 <tr>
 <td>low</td>
 <td>float</td>
 <td>Y</td>
-<td>æä½ä»·</td>
+<td>最低价</td>
 </tr>
 <tr>
 <td>vol</td>
 <td>int</td>
 <td>Y</td>
-<td>æäº¤é?/td>
+<td>成交量</td>
 </tr>
 <tr>
 <td>amount</td>
 <td>float</td>
 <td>Y</td>
-<td>æäº¤éé¢</td>
+<td>成交金额</td>
 </tr>
 </tbody></table>
-æ¥å£ç¨æ³
+接口用法
 
 ```
 
 pro = ts.pro_api()
 
-#è·åæ²ªæ·±300ETFåå¤510330.SHçåå²åéæ°æ?df = pro.stk_mins(ts_code='510330.SH', freq='1min', start_date='2025-06-20 09:00:00', end_date='2025-06-20 19:00:00')
+#获取沪深300ETF华夏510330.SH的历史分钟数据
+df = pro.stk_mins(ts_code='510330.SH', freq='1min', start_date='2025-06-20 09:00:00', end_date='2025-06-20 19:00:00')
 
 ```
 
-æ°æ®æ ·ä¾
+数据样例
 
 ```
        ts_code           trade_time  close   open   high    low        vol      amount

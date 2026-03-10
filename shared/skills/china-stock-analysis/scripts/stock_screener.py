@@ -83,12 +83,12 @@ class StockScreener:
 
     @retry_on_failure(max_retries=3, delay=2.0)
     def _get_all_stocks_realtime(self) -> pd.DataFrame:
-        """获取全部A股实时数据（带重试）"""
+        """获取全部A股实时数据(带重试)"""
         return ak.stock_zh_a_spot_em()
 
     @retry_on_failure(max_retries=3, delay=2.0)
     def _get_index_constituents(self, index_code: str) -> list:
-        """获取指数成分股列表（带重试）"""
+        """获取指数成分股列表(带重试)"""
         df = ak.index_stock_cons(symbol=index_code)
         return df['品种代码'].tolist()
 
@@ -169,7 +169,7 @@ class StockScreener:
             max_val=filters.get('debt_ratio_max')
         )
 
-        # 总市值筛选（转换为亿）
+        # 总市值筛选(转换为亿)
         if '总市值' in filtered.columns:
             if filters.get('market_cap_min') is not None or filters.get('market_cap_max') is not None:
                 filtered['总市值_亿'] = pd.to_numeric(filtered['总市值'], errors='coerce') / 1e8
@@ -182,7 +182,7 @@ class StockScreener:
         return filtered
 
     def _get_numeric_value(self, row: pd.Series, column: str) -> float:
-        """从行中获取数值，无效返回 NaN"""
+        """从行中获取数值,无效返回 NaN"""
         return pd.to_numeric(row.get(column, np.nan), errors='coerce')
 
     def calculate_score(self, row: pd.Series) -> float:

@@ -155,7 +155,7 @@ const doc = new Document({
 
 ```javascript
 // WRONG - never manually insert bullet characters
-new Paragraph({ children: [new TextRun("鈥?Item")] })  // BAD
+new Paragraph({ children: [new TextRun("• Item")] })  // BAD
 new Paragraph({ children: [new TextRun("\u2022 Item")] })  // BAD
 
 // CORRECT - use numbering config with LevelFormat.BULLET
@@ -163,7 +163,7 @@ const doc = new Document({
   numbering: {
     config: [
       { reference: "bullets",
-        levels: [{ level: 0, format: LevelFormat.BULLET, text: "鈥?, alignment: AlignmentType.LEFT,
+        levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT,
           style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
       { reference: "numbers",
         levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT,

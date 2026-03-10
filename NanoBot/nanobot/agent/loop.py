@@ -330,7 +330,7 @@ class AgentLoop:
             return response.content or "无响应"
         except Exception as e:
             logger.error(f"AI call for command failed: {e}")
-            return f"AI 调用失败：{e}"
+            return f"AI 调用失败:{e}"
 
     async def _switch_model(self, provider_name: str, model_name: str) -> None:
         """Hot-swap the current model and provider."""
@@ -339,7 +339,7 @@ class AgentLoop:
             models_config = {}
             if self.models_config_path and self.models_config_path.exists():
                 import json
-                models_config = json.loads(self.models_config_path.read_text())
+                models_config = json.loads(self.models_config_path.read_text(encoding="utf-8"))
 
             if not models_config:
                 logger.warning("No models config found, cannot switch model")

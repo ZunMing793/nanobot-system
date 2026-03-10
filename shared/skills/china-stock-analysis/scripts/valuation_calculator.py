@@ -138,7 +138,7 @@ class ValuationCalculator:
 
         参数:
             required_return: 要求回报率 (%)
-            dividend_growth: 股息增长率 (%)，如果为None则自动计算
+            dividend_growth: 股息增长率 (%),如果为None则自动计算
         """
         result = {
             "method": "DDM股息折现",
@@ -157,7 +157,7 @@ class ValuationCalculator:
 
         if not dividend_history:
             result["error"] = "无分红历史数据"
-            result["note"] = "该公司可能分红较少或不稳定，不适合DDM估值"
+            result["note"] = "该公司可能分红较少或不稳定,不适合DDM估值"
             return result
 
         try:
@@ -169,7 +169,7 @@ class ValuationCalculator:
                     recent_dividends.append(div)
 
             if len(recent_dividends) < 2:
-                result["error"] = "分红数据不足，无法使用DDM"
+                result["error"] = "分红数据不足,无法使用DDM"
                 return result
 
             current_dividend = recent_dividends[0]
@@ -216,17 +216,17 @@ class ValuationCalculator:
     def _assess_percentile(self, percentile: float) -> str:
         """根据分位数评估估值水平"""
         if percentile < 20:
-            return "处于历史低位，可能被低估"
+            return "处于历史低位,可能被低估"
         elif percentile < 40:
             return "处于历史较低水平"
         elif percentile < 60:
             return "处于历史中等水平"
         elif percentile < 80:
             return "处于历史较高水平"
-        return "处于历史高位，估值偏贵"
+        return "处于历史高位,估值偏贵"
 
     def relative_valuation(self) -> Dict:
-        """相对估值法，与行业均值和历史均值对比"""
+        """相对估值法,与行业均值和历史均值对比"""
         result = {
             "method": "相对估值",
             "current_valuation": {},
@@ -296,9 +296,9 @@ class ValuationCalculator:
         result["safety_price"] = round(safety_price, 2)
 
         if current_price < safety_price:
-            result["conclusion"] = "低估 - 当前价格低于安全边际价格，具有投资价值"
+            result["conclusion"] = "低估 - 当前价格低于安全边际价格,具有投资价值"
         elif current_price < intrinsic_value:
-            result["conclusion"] = "合理偏低 - 当前价格低于内在价值，但未达到安全边际"
+            result["conclusion"] = "合理偏低 - 当前价格低于内在价值,但未达到安全边际"
         else:
             result["conclusion"] = "高估 - 当前价格高于内在价值"
 
@@ -307,7 +307,7 @@ class ValuationCalculator:
     def comprehensive_valuation(self, discount_rate: float = 10,
                                  terminal_growth: float = 3,
                                  margin_of_safety: float = 30) -> Dict:
-        """综合估值，结合多种方法得出估值结论"""
+        """综合估值,结合多种方法得出估值结论"""
         result = {
             "code": self.stock_data.get('code', ''),
             "name": self.stock_data.get('basic_info', {}).get('name', ''),
@@ -406,8 +406,8 @@ def main():
     if args.input:
         calculator.load_data(args.input)
     elif args.code:
-        # 如果只提供代码，需要先获取数据
-        print("请先使用 data_fetcher.py 获取数据，然后使用 --input 参数")
+        # 如果只提供代码,需要先获取数据
+        print("请先使用 data_fetcher.py 获取数据,然后使用 --input 参数")
         sys.exit(1)
     else:
         print("请提供 --input 或 --code 参数")

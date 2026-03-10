@@ -217,26 +217,34 @@ def _load_models_config(config: Config) -> dict:
         models_config_file = models_path.parent / "config" / "models.json"
         if models_config_file.exists():
             import json
-            return json.loads(models_config_file.read_text())
+            return json.loads(models_config_file.read_text(encoding="utf-8"))
     return {}
 
 
-def _make_provider(config: Config, models_config: dict | None = None):
+def _find_model_config(models_config: dict | None, model_name: str) -> tuple[str | None, dict | None]:
+    if not models_config:
+        return None, None
+    models = models_config.get("models", {})
+    if model_name in models:
+        return model_name, models[model_name]
+    for key, item in models.items():
+        if item.get("model") == model_name:
+            return key, item
+    return None, None
+
+
+def _make_provider_for_model(config: Config, selected_model: str, models_config: dict | None = None):
     """Create the appropriate LLM provider from config or models.json."""
     from nanobot.providers.openai_codex_provider import OpenAICodexProvider
     from nanobot.providers.azure_openai_provider import AzureOpenAIProvider
 
-    model = config.agents.defaults.model
+    model = selected_model
     provider_name = config.get_provider_name(model)
     p = config.get_provider(model)
 
     # Check models.json for provider config
     if models_config:
-        model_cfg = None
-        for key, m in models_config.get("models", {}).items():
-            if m.get("model") == model:
-                model_cfg = m
-                break
+        _, model_cfg = _find_model_config(models_config, model)
 
         if model_cfg:
             provider_name_from_cfg = model_cfg.get("provider", provider_name)
@@ -302,6 +310,42 @@ def _make_provider(config: Config, models_config: dict | None = None):
         extra_headers=p.extra_headers if p else None,
         provider_name=provider_name,
     )
+
+
+def _make_provider(config: Config, models_config: dict | None = None):
+    model = config.agents.defaults.model
+    primary_provider = _make_provider_for_model(config, model, models_config)
+
+    from nanobot.providers.fallback_provider import FallbackProvider, FallbackTarget
+
+    model_key, model_cfg = _find_model_config(models_config, model)
+    fallback_models = []
+    if model_cfg:
+        fallback_models = list(model_cfg.get("fallback_models", []))
+
+    if not fallback_models:
+        return primary_provider
+
+    targets = [
+        FallbackTarget(
+            model=model,
+            provider=primary_provider,
+            label=model_key or model,
+        )
+    ]
+    for fallback_name in fallback_models:
+        fallback_key, fallback_cfg = _find_model_config(models_config, fallback_name)
+        fallback_model = fallback_cfg.get("model", fallback_name) if fallback_cfg else fallback_name
+        fallback_provider = _make_provider_for_model(config, fallback_model, models_config)
+        targets.append(
+            FallbackTarget(
+                model=fallback_model,
+                provider=fallback_provider,
+                label=fallback_key or fallback_name,
+            )
+        )
+
+    return FallbackProvider(primary=targets[0], fallbacks=targets[1:])
 
 
 # ============================================================================

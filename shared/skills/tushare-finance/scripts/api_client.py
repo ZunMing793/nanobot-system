@@ -2,7 +2,7 @@
 """
 Tushare API 客户端
 
-封装 Tushare Pro API，提供简洁易用的接口
+封装 Tushare Pro API,提供简洁易用的接口
 """
 
 import os
@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# 配置文件路径（优先级高于环境变量）
+# 配置文件路径(优先级高于环境变量)
 CONFIG_PATH = Path(__file__).parent.parent / "config.json"
 
 
@@ -41,14 +41,14 @@ class TushareAPI:
         初始化 API 客户端
 
         Args:
-            token: Tushare Token，优先级：参数 > config.json
+            token: Tushare Token,优先级:参数 > config.json
         """
-        # 优先级：参数 > 配置文件
+        # 优先级:参数 > 配置文件
         self.token = token or _load_token_from_config()
         if not self.token:
             raise ValueError(
                 "未找到 Tushare Token。请创建 config.json: {\"api_key\": \"your_token\"}\n"
-                "获取 Token: https://tushare.pro（免费注册）"
+                "获取 Token: https://tushare.pro(免费注册)"
             )
 
         # 初始化 Tushare API
@@ -67,9 +67,9 @@ class TushareAPI:
         查询股票日线行情
 
         Args:
-            ts_code: 股票代码（如 "000001.SZ"）
-            start_date: 开始日期（格式：YYYY-MM-DD 或 YYYYMMDD）
-            end_date: 结束日期（格式：YYYY-MM-DD 或 YYYYMMDD）
+            ts_code: 股票代码(如 "000001.SZ")
+            start_date: 开始日期(格式:YYYY-MM-DD 或 YYYYMMDD)
+            end_date: 结束日期(格式:YYYY-MM-DD 或 YYYYMMDD)
 
         Returns:
             pd.DataFrame: 日线数据
@@ -89,7 +89,7 @@ class TushareAPI:
         if df.empty:
             logger.warning(f"未查询到数据: {ts_code}")
         else:
-            logger.info(f"查询成功，共 {len(df)} 条记录")
+            logger.info(f"查询成功,共 {len(df)} 条记录")
 
         return df
 
@@ -121,7 +121,7 @@ class TushareAPI:
         查询股票列表
 
         Args:
-            market: 市场类型（主板、创业板、科创板、CDR），None 表示全部
+            market: 市场类型(主板、创业板、科创板、CDR),None 表示全部
 
         Returns:
             pd.DataFrame: 股票列表
@@ -129,7 +129,7 @@ class TushareAPI:
         logger.info(f"查询股票列表: market={market}")
 
         df = self.pro.stock_basic(market=market)
-        logger.info(f"查询成功，共 {len(df)} 只股票")
+        logger.info(f"查询成功,共 {len(df)} 只股票")
 
         return df
 
@@ -207,7 +207,7 @@ class TushareAPI:
         查询指数日线行情
 
         Args:
-            ts_code: 指数代码（如 "000300.SH"）
+            ts_code: 指数代码(如 "000300.SH")
             start_date: 开始日期
             end_date: 结束日期
 
@@ -304,7 +304,7 @@ class TushareAPI:
         Args:
             df: 数据
             output_file: 输出文件路径
-            format: 输出格式（csv, json, excel）
+            format: 输出格式(csv, json, excel)
 
         Returns:
             bool: 是否导出成功
@@ -334,7 +334,7 @@ class TushareAPI:
         统一日期格式为 YYYYMMDD
 
         Args:
-            date_str: 日期字符串（支持 YYYY-MM-DD 或 YYYYMMDD）
+            date_str: 日期字符串(支持 YYYY-MM-DD 或 YYYYMMDD)
 
         Returns:
             str: YYYYMMDD 格式的日期

@@ -1,125 +1,126 @@
-# åå²Tickè¡æ
+# 历史Tick行情
 
-**ææ¡£ID**: 314
-**åå§é¾æ¥**: https://tushare.pro/document/2?doc_id=314
+**文档ID**: 314
+**原始链接**: https://tushare.pro/document/2?doc_id=314
 
 ---
 
-## æè´§Tickè¡ææ°æ®
+## 期货Tick行情数据
 
-è·åå¨å¸åºæè´§åçº¦çTické«é¢è¡æï¼å½åä¸æä¾APIæ¹å¼è·åï¼åªæä¾csvç½çäº¤ä»ï¼è¿10å¹´åå²æ°æ®ï¼ä¸æ¬¡æ§ç½çæ·è´ï¼æ¯ææäº¤ææææ¥æå®å¶ï¼ï¼æ¯å¤©å¢éæ´æ°ãtickè¡æå±äºåç¬çæ°æ®æå¡åå®¹ï¼ä¸å¨ç§¯åæéèç´ï¼æéæ±çç¨æ·è¯·å¾®ä¿¡èç³»ï¼waditu_a ï¼èç³»æ¶è¯·æ³¨ææè´§tickæ°æ®ã?
-æ°æ®å­æ®µåå®¹è¯´æ
+获取全市场期货合约的Tick高频行情，当前不提供API方式获取，只提供csv网盘交付，近10年历史数据，一次性网盘拷贝（支持按交易所按日期定制），每天增量更新。tick行情属于单独的数据服务内容，不在积分权限范畴，有需求的用户请微信联系：waditu_a ，联系时请注明期货tick数据。
+
+数据字段内容说明
 
 <table>
 <thead>
 <tr>
-<th>å­æ®µ</th>
-<th>ç±»å</th>
-<th>ä¸­æå«ä¹</th>
-<th>æ ·ä¾</th>
+<th>字段</th>
+<th>类型</th>
+<th>中文含义</th>
+<th>样例</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>InstrumentID</td>
 <td>string</td>
-<td>åçº¦ID</td>
+<td>合约ID</td>
 <td>cu2310</td>
 </tr>
 <tr>
 <td>BidPrice1</td>
 <td>float</td>
-<td>ä¹°ä¸ä»?/td>
+<td>买一价</td>
 <td>68190.000000</td>
 </tr>
 <tr>
 <td>BidVolume1</td>
 <td>int</td>
-<td>ä¹°ä¸é?/td>
+<td>买一量</td>
 <td>4</td>
 </tr>
 <tr>
 <td>AskPrice1</td>
 <td>float</td>
-<td>åä¸ä»?/td>
+<td>卖一价</td>
 <td>68212.000000</td>
 </tr>
 <tr>
 <td>AskVolume1</td>
 <td>int</td>
-<td>åä¸é?/td>
+<td>卖一量</td>
 <td>2</td>
 </tr>
 <tr>
 <td>LastPrice</td>
 <td>float</td>
-<td>ææ°ä»·</td>
+<td>最新价</td>
 <td>68210.000000</td>
 </tr>
 <tr>
 <td>Volume</td>
 <td>int</td>
-<td>æäº¤é?/td>
+<td>成交量</td>
 <td>3223</td>
 </tr>
 <tr>
 <td>Turnover</td>
 <td>float</td>
-<td>æäº¤éé¢</td>
+<td>成交金额</td>
 <td>382577245.000000</td>
 </tr>
 <tr>
 <td>OpenInterest</td>
 <td>int</td>
-<td>æä»é?/td>
+<td>持仓量</td>
 <td>203332.000000</td>
 </tr>
 <tr>
 <td>UpperLimitPrice</td>
 <td>float</td>
-<td>æ¶¨åä»?/td>
+<td>涨停价</td>
 <td>68210.000000</td>
 </tr>
 <tr>
 <td>LowerLimitPrice</td>
 <td>float</td>
-<td>è·åä»?/td>
+<td>跌停价</td>
 <td>62210.000000</td>
 </tr>
 <tr>
 <td>OpenPrice</td>
 <td>float</td>
-<td>ä»å¼ç?/td>
+<td>今开盘</td>
 <td>68010.000000</td>
 </tr>
 <tr>
 <td>PreSettlementPrice</td>
 <td>float</td>
-<td>æ¨ç»ç®ä»·</td>
+<td>昨结算价</td>
 <td>68110.000000</td>
 </tr>
 <tr>
 <td>PreClosePrice</td>
 <td>float</td>
-<td>æ¨æ¶çä»·</td>
+<td>昨收盘价</td>
 <td>68113.000000</td>
 </tr>
 <tr>
 <td>PreOpenInterest</td>
 <td>int</td>
-<td>æ¨æä»é</td>
+<td>昨持仓量</td>
 <td>3232343.000000</td>
 </tr>
 <tr>
 <td>TradingDay</td>
 <td>string</td>
-<td>äº¤ææ¥æ</td>
+<td>交易日期</td>
 <td>20230925</td>
 </tr>
 <tr>
 <td>UpdateTime</td>
 <td>string</td>
-<td>æ´æ°æ¶é´</td>
+<td>更新时间</td>
 <td>10:00:00.500</td>
 </tr>
 </tbody></table>
-æä»¶æ ·ä¾
+文件样例

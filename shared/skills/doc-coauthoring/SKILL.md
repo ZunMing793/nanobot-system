@@ -8,16 +8,18 @@ allowed-tools:
   - Write
 ---
 
-## ⚠️ 执行前�
-�?
-**决定使用�?skill 后，�
-须�
-�读�?*�?`doc-coauthoring/GUIDE.md`
+## ⚠️ 执行前必读
 
-**禁止事项**�?- �?不准偷懒不读�?skill 的�
-�他详细文�?- �?不准直接�?SKILL.md 中的精简格式给用户输�?
-**输出要求**�?- 输出开头�
-须列出：「已读取：SKILL.md、GUIDE.md�?
+**决定使用此 skill 后，必须先读取**：
+`C:/Users/79345/.claude/skills/doc-coauthoring/GUIDE.md`
+
+**禁止事项**：
+- ❌ 不准偷懒不读取 skill 的其他详细文件
+- ❌ 不准直接用 SKILL.md 中的精简格式给用户输出
+
+**输出要求**：
+- 输出开头必须列出：「已读取：SKILL.md、GUIDE.md」
+
 ## 触发场景
 
 - 用户提到编写文档：写文档、草拟提案、创建规范、撰写等
@@ -28,6 +30,4 @@ allowed-tools:
 
 ## 详细指南索引
 
-完整�
-容请�
-读：GUIDE.md
+完整内容请阅读：GUIDE.md

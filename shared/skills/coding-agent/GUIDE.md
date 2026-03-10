@@ -1,260 +1,303 @@
-# Coding Agent è¯¦ç»æå
+# Coding Agent 详细指南
 
-éè¿ tmux ç®¡ç Claude Code CLI ä¼è¯ï¼è®© NanoBot è½å¤æ§è¡ç¼ç¨ä»»å¡ã?
+通过 tmux 管理 Claude Code CLI 会话，让 NanoBot 能够执行编程任务。
+
 ---
 
-## 0. â ï¸ å¼ºå¶æ§è¡è§åï¼å¿è¯»ï¼
+## 0. ⚠️ 强制执行规则（必读）
 
-**ä»¥ä¸æåµå¿é¡»éè¿ tmux å¯å¨ Claude Codeï¼ç»å¯¹ä¸è½ç¨ exec/shell å½ä»¤æ¿ä»£**ï¼?
-| è§¦åè¯?| è¯´æ |
+**以下情况必须通过 tmux 启动 Claude Code，绝对不能用 exec/shell 命令替代**：
+
+| 触发词 | 说明 |
 |--------|------|
-| ãç¨ Claude å¸®æ...ã?| ç¨æ·æç¡®æå®è¦ç¨ Claude |
-| ãè®© Claude æ?..ã?| ç¨æ·æç¡®æå®è¦ç¨ Claude |
-| ãClaude Codeã?| ç¨æ·ç´æ¥æå° Claude Code |
-| ãæ¹å¼?ã?| ç¨æ·éæ©æ¹å¼2ï¼å³ coding-agentï¼?|
-| ã?claudeã?| ç¨æ·ä½¿ç¨å½ä»¤è§¦å |
+| 「用 Claude 帮我...」 | 用户明确指定要用 Claude |
+| 「让 Claude 来...」 | 用户明确指定要用 Claude |
+| 「Claude Code」 | 用户直接提到 Claude Code |
+| 「方式2」 | 用户选择方式2（即 coding-agent） |
+| 「/claude」 | 用户使用命令触发 |
 
-**éè¯¯ç¤ºä¾**ï¼ç»å¯¹ç¦æ­¢ï¼ï¼?```
-ç¨æ·: ç?Claude å¸®ææ«æé¡¹ç®ç»æ
-Bot: [å·æç´æ¥ç?exec æ§è¡ ls å½ä»¤]  â?éè¯¯ï¼?```
+**错误示例**（绝对禁止）：
+```
+用户: 用 Claude 帮我扫描项目结构
+Bot: [偷懒直接用 exec 执行 ls 命令]  ❌ 错误！
+```
 
-**æ­£ç¡®ç¤ºä¾**ï¼?```
-ç¨æ·: ç?Claude å¸®ææ«æé¡¹ç®ç»æ
-Bot: [æ§è¡ coding-agent.sh start]
-     [æ§è¡ coding-agent.sh send "æ«æé¡¹ç®ç»æ"]
-     [ç­å¾ Claude Code æ§è¡]
-     [æè·è¾åºè¿åç»ç¨æ·]  â?æ­£ç¡®ï¼?```
+**正确示例**：
+```
+用户: 用 Claude 帮我扫描项目结构
+Bot: [执行 coding-agent.sh start]
+     [执行 coding-agent.sh send "扫描项目结构"]
+     [等待 Claude Code 执行]
+     [捕获输出返回给用户]  ✅ 正确！
+```
 
-**ä¸ºä»ä¹å¿é¡»ç¨ tmux**ï¼?1. Claude Code æ¯ä¸ä¸ªäº¤äºå¼ CLIï¼éè¦é¿æè¿è¡çä¼è¯
-2. NanoBot ç?exec å·¥å·æ?60 ç§è¶æ¶éå?3. å¤æä»»å¡éè¦å¤è½®å¯¹è¯ï¼tmux å¯ä»¥ä¿æç¶æ?4. ç¨æ·æç¡®è¦æ±ç?Claude Codeï¼å¿é¡»å°éç¨æ·éæ©
+**为什么必须用 tmux**：
+1. Claude Code 是一个交互式 CLI，需要长期运行的会话
+2. NanoBot 的 exec 工具有 60 秒超时限制
+3. 复杂任务需要多轮对话，tmux 可以保持状态
+4. 用户明确要求用 Claude Code，必须尊重用户选择
 
-**åµå¥ä¼è¯é®é¢**ï¼?- Claude Code ä¸åè®¸å¨å¦ä¸ä¸?Claude Code ä¼è¯ä¸­å¯å?- èæ¬å·²å¤çï¼ä½¿ç¨ `unset CLAUDECODE && claude` ç»è¿æ£æµ?- å¦æä»ç¶å¤±è´¥ï¼æ£æ¥ç¯å¢åé?`CLAUDECODE` æ¯å¦è¢«æ­£ç¡®æ¸é?
+**嵌套会话问题**：
+- Claude Code 不允许在另一个 Claude Code 会话中启动
+- 脚本已处理：使用 `unset CLAUDECODE && claude` 绕过检测
+- 如果仍然失败，检查环境变量 `CLAUDECODE` 是否被正确清除
+
 ---
 
-## 1. æ ¸å¿åè½
+## 1. 核心功能
 
-| åè½ | è¯´æ |
+| 功能 | 说明 |
 |------|------|
-| å¯å¨ä»»å¡ | å?tmux ä¸­å¯å?Claude Code æ§è¡ç¼ç¨ä»»å¡ |
-| çæ§è¿åº¦ | å®ææ£æ¥ä»»å¡æ§è¡ç¶æ?|
-| å®æ¶äº¤äº | å?Claude Code åéæ¶æ¯ãè·åè¾å?|
-| ä¼è¯ç®¡ç | éç½®ãéæ¯ä¼è¯?|
+| 启动任务 | 在 tmux 中启动 Claude Code 执行编程任务 |
+| 监控进度 | 定期检查任务执行状态 |
+| 实时交互 | 向 Claude Code 发送消息、获取输出 |
+| 会话管理 | 重置、销毁会话 |
 
 ---
 
-## 2. å½ä»¤åè¡¨
+## 2. 命令列表
 
-### 2.1 /claude \<ä»»å¡\>
+### 2.1 /claude \<任务\>
 
-å¯å¨ä¸ä¸ªæ°ä»»å¡ãå¦æ?tmux ä¼è¯ä¸å­å¨ï¼ä¼èªå¨åå»ºã?
-**ç¤ºä¾**ï¼?```
-/claude å¸®æå?/home/ubuntu/my-project ç®å½ä¸åå»ºä¸ä¸?Python èæ¬
+启动一个新任务。如果 tmux 会话不存在，会自动创建。
+
+**示例**：
+```
+/claude 帮我在 /home/ubuntu/my-project 目录下创建一个 Python 脚本
 ```
 
 ### 2.2 /claude status
 
-æ¥çå½å Claude Code ä¼è¯ç¶æã?
-**è¿å**ï¼?- `running` - æ­£å¨æ§è¡
-- `waiting` - ç­å¾è¾å¥
-- `done` - ä»»å¡å®æ
-- `no_session` - æ ä¼è¯?
+查看当前 Claude Code 会话状态。
+
+**返回**：
+- `running` - 正在执行
+- `waiting` - 等待输入
+- `done` - 任务完成
+- `no_session` - 无会话
+
 ### 2.3 /claude reset
 
-éæ¯å½å?tmux ä¼è¯å¹¶éæ°åå»ºãç¨äºï¼
-- ä»»å¡å¡ä½æ æ³ç»§ç»­
-- éè¦åæ¢å°å®å¨ä¸åçä»»å?- ä¼è¯åºç°å¼å¸¸
+销毁当前 tmux 会话并重新创建。用于：
+- 任务卡住无法继续
+- 需要切换到完全不同的任务
+- 会话出现异常
 
 ### 2.4 /claude capture
 
-è·å Claude Code å½åè¾åºï¼æå?50 è¡ï¼ã?
+获取 Claude Code 当前输出（最后 50 行）。
+
 ---
 
-## 3. tmux æä½æ¹æ³
+## 3. tmux 操作方法
 
-### 3.1 ä¼è¯ä¿¡æ¯
+### 3.1 会话信息
 
-| éç½®é¡?| å?|
+| 配置项 | 值 |
 |--------|-----|
-| ä¼è¯åç§° | `claude-code` |
-| å·¥ä½ç®å½ | `/home/ubuntu` |
+| 会话名称 | `claude-code` |
+| 工作目录 | `/home/ubuntu` |
 | Shell | `bash` |
 
-### 3.2 æ ¸å¿å½ä»¤
+### 3.2 核心命令
 
 ```bash
-# å¯å¨ä¼è¯å¹¶è¿è¡?Claude Code
+# 启动会话并运行 Claude Code
 tmux new-session -d -s claude-code -c /home/ubuntu "claude"
 
-# åéæ¶æ¯ï¼æ¨¡æç¨æ·è¾å¥ï¼?tmux send-keys -t claude-code "ç¨æ·æ¶æ¯åå®¹" Enter
+# 发送消息（模拟用户输入）
+tmux send-keys -t claude-code "用户消息内容" Enter
 
-# æè·è¾åºï¼æå?50 è¡ï¼
+# 捕获输出（最后 50 行）
 tmux capture-pane -t claude-code -p -S -50
 
-# æ£æ¥ä¼è¯æ¯å¦å­å?tmux has-session -t claude-code 2>/dev/null && echo "exists" || echo "not_exists"
+# 检查会话是否存在
+tmux has-session -t claude-code 2>/dev/null && echo "exists" || echo "not_exists"
 
-# éæ¯ä¼è¯?tmux kill-session -t claude-code
+# 销毁会话
+tmux kill-session -t claude-code
 ```
 
-### 3.3 è¾å©èæ¬
+### 3.3 辅助脚本
 
-ä½¿ç¨å°è£å¥½çèæ¬ç®åæä½ï¼
+使用封装好的脚本简化操作：
 
 ```bash
-# å¯å¨
-coding-agent/scripts/coding-agent.sh start
+# 启动
+C:/Users/79345/.claude/skills/coding-agent/scripts/coding-agent.sh start
 
-# åéæ¶æ?coding-agent/scripts/coding-agent.sh send "å¸®æåä¸ª hello world"
+# 发送消息
+C:/Users/79345/.claude/skills/coding-agent/scripts/coding-agent.sh send "帮我写个 hello world"
 
-# æè·è¾åº
-coding-agent/scripts/coding-agent.sh capture
+# 捕获输出
+C:/Users/79345/.claude/skills/coding-agent/scripts/coding-agent.sh capture
 
-# æ£æ¥ç¶æ?coding-agent/scripts/coding-agent.sh status
+# 检查状态
+C:/Users/79345/.claude/skills/coding-agent/scripts/coding-agent.sh status
 
-# éç½®
-coding-agent/scripts/coding-agent.sh reset
+# 重置
+C:/Users/79345/.claude/skills/coding-agent/scripts/coding-agent.sh reset
 
-# è®°å½æ¥å¿
-coding-agent/scripts/coding-agent.sh log "ä»»å¡å®æï¼åå»?hello.py"
+# 记录日志
+C:/Users/79345/.claude/skills/coding-agent/scripts/coding-agent.sh log "任务完成：创建 hello.py"
 ```
 
 ---
 
-## 4. ä»»å¡çæ§æºå¶
+## 4. 任务监控机制
 
-### 4.1 çæ§æµç¨
+### 4.1 监控流程
 
 ```
-ç¨æ·åéä»»å?â?å¯å¨ tmux ä¼è¯ â?å®ææ£æ¥ç¶æ?â?æ£æµå®æ?â?æ±æ¥ç»æ
+用户发送任务 → 启动 tmux 会话 → 定期检查状态 → 检测完成 → 汇报结果
 ```
 
-### 4.2 æ£æ¥é¢ç?
-| ç¶æ?| æ£æ¥é´é?| è¶æ¶å¤ç |
+### 4.2 检查频率
+
+| 状态 | 检查间隔 | 超时处理 |
 |------|----------|----------|
-| ä»»å¡æ§è¡ä¸?| æ¯?1 åé | 3 åéæ ååºæéç¨æ?|
-| ç­å¾è¾å¥ | ç«å³éç¥ç¨æ· | ç­å¾ç¨æ·åå¤ |
+| 任务执行中 | 每 1 分钟 | 3 分钟无响应提醒用户 |
+| 等待输入 | 立即通知用户 | 等待用户回复 |
 
-### 4.3 ç¶ææ£æµé»è¾
+### 4.3 状态检测逻辑
 
-1. **running**: tmux ä¼è¯å­å¨ï¼æåå è¡æ²¡ææç¤ºç¬¦
-2. **waiting**: æ£æµå° Claude Code ç­å¾è¾å¥çç¹å¾ï¼å¦?`>`ã`?`ã`[y/n]`ï¼?3. **done**: è¾åºä¸­åå?`[TASK_DONE]` æ è®°æä»»å¡å®æç¹å¾?
+1. **running**: tmux 会话存在，最后几行没有提示符
+2. **waiting**: 检测到 Claude Code 等待输入的特征（如 `>`、`?`、`[y/n]`）
+3. **done**: 输出中包含 `[TASK_DONE]` 标记或任务完成特征
+
 ---
 
-## 5. ä»»å¡å®ææ£æµ?
-### 5.1 å®ææ è®°
+## 5. 任务完成检测
 
-Claude Code å®æä»»å¡åä¼å¨è¾åºä¸­æ¾ç¤ºï¼?- `Task completed successfully`
-- æç¨æ·å¨ä»»å¡æè¿°ä¸­çº¦å®?`[TASK_DONE]` æ è®°
+### 5.1 完成标记
 
-### 5.2 ç­å¾è¾å¥ç¹å¾
+Claude Code 完成任务后会在输出中显示：
+- `Task completed successfully`
+- 或用户在任务描述中约定 `[TASK_DONE]` 标记
 
-æ£æµä»¥ä¸æ¨¡å¼å¤æ­æ¯å¦å¨ç­å¾è¾å¥ï¼?```
+### 5.2 等待输入特征
+
+检测以下模式判断是否在等待输入：
+```
 >
 ?
 [y/n]
 (Y/n)
-éæ©
-è¯·è¾å?```
+选择
+请输入
+```
 
 ---
 
-## 6. æ¥å¿è®°å½æ ¼å¼
+## 6. 日志记录格式
 
-### 6.1 æ¥å¿æä»¶
+### 6.1 日志文件
 
-`coding-agent/logs/tasks.log`
+`C:/Users/79345/.claude/skills/coding-agent/logs/tasks.log`
 
-### 6.2 æ¥å¿æ ¼å¼
+### 6.2 日志格式
 
 ```
-[2024-01-15 14:30:00] [START] ç¨æ·ï¼å¸®æåä¸?hello world
-[2024-01-15 14:32:15] [STATUS] ä»»å¡æ§è¡ä¸?[2024-01-15 14:35:00] [WAITING] Claude è¯¢é®ï¼ä½¿ç¨ä»ä¹è¯­è¨ï¼?[2024-01-15 14:35:30] [INPUT] ç¨æ·åå¤ï¼Python
-[2024-01-15 14:38:00] [DONE] ä»»å¡å®æï¼åå»?hello.py
+[2024-01-15 14:30:00] [START] 用户：帮我写个 hello world
+[2024-01-15 14:32:15] [STATUS] 任务执行中
+[2024-01-15 14:35:00] [WAITING] Claude 询问：使用什么语言？
+[2024-01-15 14:35:30] [INPUT] 用户回复：Python
+[2024-01-15 14:38:00] [DONE] 任务完成：创建 hello.py
 ```
 
-### 6.3 æ¥å¿çº§å«
+### 6.3 日志级别
 
-| çº§å« | è¯´æ |
+| 级别 | 说明 |
 |------|------|
-| START | ä»»å¡å¼å§?|
-| STATUS | ç¶ææ´æ?|
-| WAITING | ç­å¾ç¨æ·è¾å¥ |
-| INPUT | ç¨æ·è¾å¥ |
-| DONE | ä»»å¡å®æ |
-| ERROR | éè¯¯åç |
+| START | 任务开始 |
+| STATUS | 状态更新 |
+| WAITING | 等待用户输入 |
+| INPUT | 用户输入 |
+| DONE | 任务完成 |
+| ERROR | 错误发生 |
 
 ---
 
-## 7. ç¤ºä¾å¯¹è¯æµç¨
+## 7. 示例对话流程
 
-### åºæ¯ï¼ç¨æ·è¯·æ±åå»ºèæ?
+### 场景：用户请求创建脚本
+
 ```
-ç¨æ·: ç?Claude å¸®æå?/home/ubuntu ç®å½ä¸åå»ºä¸ä¸?Python èæ¬ï¼è¾å?hello world
+用户: 用 Claude 帮我在 /home/ubuntu 目录下创建一个 Python 脚本，输出 hello world
 
-Bot: [è¯»å GUIDE.md]
-å·²è¯»åï¼SKILL.mdãGUIDE.md
+Bot: [读取 GUIDE.md]
+已读取：SKILL.md、GUIDE.md
 
-å¥½çï¼ææ¥å¯å?Claude Code æ§è¡è¿ä¸ªä»»å¡ã?
-[æ§è¡] coding-agent.sh start
-[æ§è¡] coding-agent.sh send "å?/home/ubuntu ç®å½ä¸åå»ºä¸ä¸?Python èæ¬ï¼è¾å?hello world"
-[æ§è¡] coding-agent.sh log "[START] åå»º Python hello world èæ¬"
+好的，我来启动 Claude Code 执行这个任务。
 
-Bot: ä»»å¡å·²å¯å¨ï¼æ­£å¨æ§è¡ä¸?..
+[执行] coding-agent.sh start
+[执行] coding-agent.sh send "在 /home/ubuntu 目录下创建一个 Python 脚本，输出 hello world"
+[执行] coding-agent.sh log "[START] 创建 Python hello world 脚本"
 
-[ç­å¾ 1 åéåæ£æ¥]
+Bot: 任务已启动，正在执行中...
 
-[æ§è¡] coding-agent.sh status â?waiting
-[æ§è¡] coding-agent.sh capture
+[等待 1 分钟后检查]
 
-Bot: Claude Code è¯¢é®ï¼æ¨å¸æèæ¬å½åä¸?hello.py å¯ä»¥åï¼
+[执行] coding-agent.sh status → waiting
+[执行] coding-agent.sh capture
 
-ç¨æ·: å¯ä»¥
+Bot: Claude Code 询问：您希望脚本命名为 hello.py 可以吗？
 
-[æ§è¡] coding-agent.sh send "å¯ä»¥ï¼å½åä¸º hello.py"
-[æ§è¡] coding-agent.sh log "[INPUT] ç¨æ·ç¡®è®¤å½å"
+用户: 可以
 
-[ç­å¾ 30 ç§åæ£æ¥]
+[执行] coding-agent.sh send "可以，命名为 hello.py"
+[执行] coding-agent.sh log "[INPUT] 用户确认命名"
 
-[æ§è¡] coding-agent.sh status â?done
-[æ§è¡] coding-agent.sh capture
-[æ§è¡] coding-agent.sh log "[DONE] åå»º hello.py æå"
+[等待 30 秒后检查]
 
-Bot: ä»»å¡å®æï¼å·²å?/home/ubuntu/hello.py åå»ºèæ¬ã?```
+[执行] coding-agent.sh status → done
+[执行] coding-agent.sh capture
+[执行] coding-agent.sh log "[DONE] 创建 hello.py 成功"
+
+Bot: 任务完成！已在 /home/ubuntu/hello.py 创建脚本。
+```
 
 ---
 
-## 8. æ³¨æäºé¡¹
+## 8. 注意事项
 
-### 8.1 è¶æ¶å¤ç
+### 8.1 超时处理
 
-- NanoBot exec å·¥å·é»è®¤ 60 ç§è¶æ?- é¿æ¶é´ä»»å¡å¿é¡»å¨ tmux ä¸­è¿è¡ï¼ä¸è½ç´æ¥ exec
-- 3 åéæ ååºè¦ä¸»å¨æéç¨æ·
+- NanoBot exec 工具默认 60 秒超时
+- 长时间任务必须在 tmux 中运行，不能直接 exec
+- 3 分钟无响应要主动提醒用户
 
-### 8.2 ä¼è¯å²çª
+### 8.2 会话冲突
 
-- ç¡®ä¿ä¼è¯åç§° `claude-code` ä¸ä¼ä¸å¶ä»è¿ç¨å²çª?- åä¸æ¶é´åªè½æä¸ä¸ªæ´»è·ä»»å?- æ°ä»»å¡ä¼è¦çæ§ä»»å¡ï¼åæéç¨æ·ï¼
+- 确保会话名称 `claude-code` 不会与其他进程冲突
+- 同一时间只能有一个活跃任务
+- 新任务会覆盖旧任务（先提醒用户）
 
-### 8.3 éè¯¯å¤ç
+### 8.3 错误处理
 
-| éè¯¯ | å¤çæ¹å¼ |
+| 错误 | 处理方式 |
 |------|----------|
-| tmux ä¼è¯ä¸å­å?| èªå¨åå»ºæ°ä¼è¯?|
-| Claude Code å´©æº | éå¯ä¼è¯ï¼éç¥ç¨æ· |
-| æéä¸è¶³ | æ£æ¥æä»?ç®å½æéï¼éç¥ç¨æ· |
+| tmux 会话不存在 | 自动创建新会话 |
+| Claude Code 崩溃 | 重启会话，通知用户 |
+| 权限不足 | 检查文件/目录权限，通知用户 |
 
-### 8.4 å®å¨æ³¨æ
+### 8.4 安全注意
 
-- ä¸è¦å?Claude Code ä¸­æ§è¡å±é©å½ä»¤ï¼rm -rfãsudo ç­ï¼
-- ä¿®æ¹éè¦æä»¶åæéç¨æ·ç¡®è®?- ææä¿¡æ¯ä¸è¦è®°å½å°æ¥å¿?
+- 不要在 Claude Code 中执行危险命令（rm -rf、sudo 等）
+- 修改重要文件前提醒用户确认
+- 敏感信息不要记录到日志
+
 ---
 
-## 9. èæ¬å®ç°åè?
+## 9. 脚本实现参考
+
 ```bash
 #!/bin/bash
-# coding-agent.sh - Claude Code tmux ç®¡çèæ¬
+# coding-agent.sh - Claude Code tmux 管理脚本
 
 SESSION_NAME="claude-code"
 WORK_DIR="/home/ubuntu"
-LOG_FILE="coding-agent/logs/tasks.log"
+LOG_FILE="C:/Users/79345/.claude/skills/coding-agent/logs/tasks.log"
 
 log_message() {
     local level="$1"
@@ -283,9 +326,9 @@ case "$1" in
         if ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
             echo "no_session"
         else
-            # æ£æ¥æåå è¡æ¯å¦å¨ç­å¾è¾å¥
+            # 检查最后几行是否在等待输入
             local output=$(tmux capture-pane -t "$SESSION_NAME" -p -S -5)
-            if echo "$output" | grep -qE '(^\s*>|^\s*\?|\[y/n\]|\(Y/n\)|éæ©|è¯·è¾å?'; then
+            if echo "$output" | grep -qE '(^\s*>|^\s*\?|\[y/n\]|\(Y/n\)|选择|请输入)'; then
                 echo "waiting"
             elif echo "$output" | grep -qE '(Task completed|TASK_DONE)'; then
                 echo "done"
@@ -312,12 +355,13 @@ esac
 
 ---
 
-## 10. å¿«éåè?
-| æä½ | å½ä»¤ |
+## 10. 快速参考
+
+| 操作 | 命令 |
 |------|------|
-| å¯å¨ä»»å¡ | `/claude <ä»»å¡æè¿°>` |
-| æ¥çç¶æ?| `/claude status` |
-| è·åè¾åº | `/claude capture` |
-| éç½®ä¼è¯ | `/claude reset` |
-| èæ¬è·¯å¾ | `coding-agent/scripts/coding-agent.sh` |
-| æ¥å¿è·¯å¾ | `coding-agent/logs/tasks.log` |
+| 启动任务 | `/claude <任务描述>` |
+| 查看状态 | `/claude status` |
+| 获取输出 | `/claude capture` |
+| 重置会话 | `/claude reset` |
+| 脚本路径 | `C:/Users/79345/.claude/skills/coding-agent/scripts/coding-agent.sh` |
+| 日志路径 | `C:/Users/79345/.claude/skills/coding-agent/logs/tasks.log` |

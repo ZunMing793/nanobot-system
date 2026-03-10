@@ -13,7 +13,7 @@ When using an existing presentation as a template:
 
 2. **Plan slide mapping**: For each content section, choose a template slide.
 
-   鈿狅笍 **USE VARIED LAYOUTS** 鈥?monotonous presentations are a common failure mode. Don't default to basic title + bullet slides. Actively seek out:
+   ⚠️ **USE VARIED LAYOUTS** — monotonous presentations are a common failure mode. Don't default to basic title + bullet slides. Actively seek out:
    - Multi-column layouts (2-column, 3-column)
    - Image + text combinations
    - Full-bleed images with text overlay
@@ -24,7 +24,7 @@ When using an existing presentation as a template:
 
    **Avoid:** Repeating the same text-heavy layout for every slide.
 
-   Match content type to layout style (e.g., key points 鈫?bullet slide, team info 鈫?multi-column, testimonials 鈫?quote slide).
+   Match content type to layout style (e.g., key points → bullet slide, team info → multi-column, testimonials → quote slide).
 
 3. **Unpack**: `python scripts/office/unpack.py template.pptx unpacked/`
 
@@ -35,7 +35,7 @@ When using an existing presentation as a template:
    - **Complete all structural changes before step 5**
 
 5. **Edit content**: Update text in each `slide{N}.xml`.
-   **Use subagents here if available** 鈥?slides are separate XML files, so subagents can edit in parallel.
+   **Use subagents here if available** — slides are separate XML files, so subagents can edit in parallel.
 
 6. **Clean**: `python scripts/clean.py unpacked/`
 
@@ -94,19 +94,19 @@ python scripts/thumbnail.py input.pptx [output_prefix] [--cols N]
 
 Creates `thumbnails.jpg` with slide filenames as labels. Default 3 columns, max 12 per grid.
 
-**Use for template analysis only** (choosing layouts). For visual QA, use `soffice` + `pdftoppm` to create full-resolution individual slide images鈥攕ee SKILL.md.
+**Use for template analysis only** (choosing layouts). For visual QA, use `soffice` + `pdftoppm` to create full-resolution individual slide images—see SKILL.md.
 
 ---
 
 ## Slide Operations
 
-Slide order is in `ppt/presentation.xml` 鈫?`<p:sldIdLst>`.
+Slide order is in `ppt/presentation.xml` → `<p:sldIdLst>`.
 
 **Reorder**: Rearrange `<p:sldId>` elements.
 
 **Delete**: Remove `<p:sldId>`, then run `clean.py`.
 
-**Add**: Use `add_slide.py`. Never manually copy slide files鈥攖he script handles notes references, Content_Types.xml, and relationship IDs that manual copying misses.
+**Add**: Use `add_slide.py`. Never manually copy slide files—the script handles notes references, Content_Types.xml, and relationship IDs that manual copying misses.
 
 ---
 
@@ -119,7 +119,7 @@ Slide order is in `ppt/presentation.xml` 鈫?`<p:sldIdLst>`.
 
 For each slide:
 1. Read the slide's XML
-2. Identify ALL placeholder content鈥攖ext, images, charts, icons, captions
+2. Identify ALL placeholder content—text, images, charts, icons, captions
 3. Replace each placeholder with final content
 
 **Use the Edit tool, not sed or Python scripts.** The Edit tool forces specificity about what to replace and where, yielding better reliability.
@@ -130,7 +130,7 @@ For each slide:
   - Slide titles
   - Section headers within a slide
   - Inline labels like (e.g.: "Status:", "Description:") at the start of a line
-- **Never use unicode bullets (鈥?**: Use proper list formatting with `<a:buChar>` or `<a:buAutoNum>`
+- **Never use unicode bullets (•)**: Use proper list formatting with `<a:buChar>` or `<a:buAutoNum>`
 - **Bullet consistency**: Let bullets inherit from the layout. Only specify `<a:buChar>` or `<a:buNone>`.
 
 ---
@@ -150,20 +150,20 @@ When replacing text with different length content:
 - Test with visual QA after text changes
 - Consider truncating or splitting content to fit the template's design constraints
 
-**Template slots 鈮?Source items**: If template has 4 team members but source has 3 users, delete the 4th member's entire group (image + text boxes), not just the text.
+**Template slots ≠ Source items**: If template has 4 team members but source has 3 users, delete the 4th member's entire group (image + text boxes), not just the text.
 
 ### Multi-Item Content
 
-If source has multiple items (numbered lists, multiple sections), create separate `<a:p>` elements for each 鈥?**never concatenate into one string**.
+If source has multiple items (numbered lists, multiple sections), create separate `<a:p>` elements for each — **never concatenate into one string**.
 
-**鉂?WRONG** 鈥?all items in one paragraph:
+**❌ WRONG** — all items in one paragraph:
 ```xml
 <a:p>
   <a:r><a:rPr .../><a:t>Step 1: Do the first thing. Step 2: Do the second thing.</a:t></a:r>
 </a:p>
 ```
 
-**鉁?CORRECT** 鈥?separate paragraphs with bold headers:
+**✅ CORRECT** — separate paragraphs with bold headers:
 ```xml
 <a:p>
   <a:pPr algn="l"><a:lnSpc><a:spcPts val="3919"/></a:lnSpc></a:pPr>
@@ -194,10 +194,10 @@ Handled automatically by unpack/pack. But the Edit tool converts smart quotes to
 
 | Character | Name | Unicode | XML Entity |
 |-----------|------|---------|------------|
-| `鈥渀 | Left double quote | U+201C | `&#x201C;` |
-| `鈥漙 | Right double quote | U+201D | `&#x201D;` |
-| `鈥榒 | Left single quote | U+2018 | `&#x2018;` |
-| `鈥檂 | Right single quote | U+2019 | `&#x2019;` |
+| `“` | Left double quote | U+201C | `&#x201C;` |
+| `”` | Right double quote | U+201D | `&#x201D;` |
+| `‘` | Left single quote | U+2018 | `&#x2018;` |
+| `’` | Right single quote | U+2019 | `&#x2019;` |
 
 ### Other
 

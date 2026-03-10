@@ -1,68 +1,79 @@
-# Agent Browser è¯¦ç»æå
+# Agent Browser 详细指南
 
-ç½é¡µèªå¨åæµè§å¨æä½æåã?
+网页自动化浏览器操作指南。
+
 ---
 
-## 1. å¿«éä½¿ç¨ï¼æ¨èï¼?
-ä½¿ç¨ `ab` å½ä»¤ï¼èªå¨å¤çåæ£æµï¼
+## 1. 快速使用（推荐）
+
+使用 `ab` 命令，自动处理反检测：
 
 ```bash
-# æå¼ç½é¡µï¼èªå¨è®¾ç½®åæ£æµï¼
+# 打开网页（自动设置反检测）
 ab open "https://mp.weixin.qq.com/s/xxx"
 
-# è·åé¡µé¢åå®¹
+# 获取页面内容
 ab snapshot
 
-# æªå¾
+# 截图
 ab screenshot
 
-# å³é­æµè§å?ab close
-```
-
----
-
-## 2. è¯»åå¾®ä¿¡å¬ä¼å·æç«?
-```bash
-ab open "https://mp.weixin.qq.com/s/xxx"
-ab snapshot
-```
-
----
-
-## 3. å¸¸ç¨å½ä»¤
-
-| å½ä»¤ | è¯´æ |
-|------|------|
-| `ab open <url>` | æå¼ç½é¡µ |
-| `ab snapshot` | è·åé¡µé¢å¿«ç§ |
-| `ab snapshot -i` | åªè·åå¯äº¤äºåç´  |
-| `ab click @e1` | ç¹å»åç´  |
-| `ab fill @e2 "text"` | å¡«åè¾å¥æ¡?|
-| `ab screenshot` | æªå¾ |
-| `ab close` | å³é­æµè§å?|
-
----
-
-## 4. æä½æµç¨ç¤ºä¾
-
-### 4.1 è¯»åæç« åå®¹
-
-```bash
-ab open "https://example.com/article"
-ab snapshot
-# åæåå®¹å?ab close
-```
-
-### 4.2 èªå¨åæä½?
-```bash
-ab open "https://example.com"
-ab snapshot -i          # è·åå¯äº¤äºåç´?ab click @e1            # ç¹å»ç¬¬ä¸ä¸ªåç´?ab fill @e2 "æç´¢åå®¹"  # å¡«åè¾å¥æ¡?ab snapshot             # è·åç»æ
+# 关闭浏览器
 ab close
 ```
 
 ---
 
-## 5. æ³¨æäºé¡¹
+## 2. 读取微信公众号文章
 
-- ä½¿ç¨ `ab` å½ä»¤ä¼èªå¨è®¾ç½®åæ£æµéç½?- å¾®ä¿¡å¬ä¼å·ç­ç½ç«**å¿é¡»**ä½¿ç¨ `ab` å½ä»¤èé `agent-browser`
-- æä½å®æåè®°å¾?`ab close` å³é­æµè§å?- å¦æé¡µé¢å è½½æ¢ï¼å¯ä»¥ç­å¾ååæ§è¡ snapshot
+```bash
+ab open "https://mp.weixin.qq.com/s/xxx"
+ab snapshot
+```
+
+---
+
+## 3. 常用命令
+
+| 命令 | 说明 |
+|------|------|
+| `ab open <url>` | 打开网页 |
+| `ab snapshot` | 获取页面快照 |
+| `ab snapshot -i` | 只获取可交互元素 |
+| `ab click @e1` | 点击元素 |
+| `ab fill @e2 "text"` | 填写输入框 |
+| `ab screenshot` | 截图 |
+| `ab close` | 关闭浏览器 |
+
+---
+
+## 4. 操作流程示例
+
+### 4.1 读取文章内容
+
+```bash
+ab open "https://example.com/article"
+ab snapshot
+# 分析内容后
+ab close
+```
+
+### 4.2 自动化操作
+
+```bash
+ab open "https://example.com"
+ab snapshot -i          # 获取可交互元素
+ab click @e1            # 点击第一个元素
+ab fill @e2 "搜索内容"  # 填写输入框
+ab snapshot             # 获取结果
+ab close
+```
+
+---
+
+## 5. 注意事项
+
+- 使用 `ab` 命令会自动设置反检测配置
+- 微信公众号等网站**必须**使用 `ab` 命令而非 `agent-browser`
+- 操作完成后记得 `ab close` 关闭浏览器
+- 如果页面加载慢，可以等待后再执行 snapshot

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
 A股数据获取模块
-支持双数据源：akshare（免费）和 tushare（需要 token）
+支持双数据源:akshare(免费)和 tushare(需要 token)
 
 依赖: pip install akshare pandas
 可选: pip install tushare  # 如需使用 tushare 数据源
 
-协作关系：
-- 本脚本：获取数据供 china-stock-analysis 分析使用
-- tushare-finance skill：如已配置 token，可调用其数据接口
+协作关系:
+- 本脚本:获取数据供 china-stock-analysis 分析使用
+- tushare-finance skill:如已配置 token,可调用其数据接口
 """
 
 import argparse
@@ -21,10 +21,10 @@ from typing import Optional, Callable, Dict, Any
 from functools import wraps
 from pathlib import Path
 
-# 默认数据源策略：
-# - 日线行情：tushare（稳定）
-# - 财务数据：akshare（功能全）
-# - 基本信息：akshare（tushare 有频率限制）
+# 默认数据源策略:
+# - 日线行情:tushare(稳定)
+# - 财务数据:akshare(功能全)
+# - 基本信息:akshare(tushare 有频率限制)
 DEFAULT_DATA_SOURCE = "auto"
 
 # tushare-finance skill 的配置路径
@@ -32,17 +32,17 @@ TUSHARE_CONFIG_PATH = Path("/home/NanoBot/shared/skills/tushare-finance/config.j
 
 # 数据源状态
 DATA_SOURCES = {
-    "akshare": {"available": False, "name": "akshare（免费，功能全）"},
-    "tushare": {"available": False, "name": "tushare（稳定，权限有限）"}
+    "akshare": {"available": False, "name": "akshare(免费,功能全)"},
+    "tushare": {"available": False, "name": "tushare(稳定,权限有限)"}
 }
 
 # 数据类型与数据源映射
 DATA_SOURCE_PRIORITY = {
-    "price": ["tushare", "akshare"],      # 日线行情：tushare 优先（稳定）
-    "financial": ["akshare", "tushare"],  # 财务数据：akshare 优先（功能全）
-    "basic": ["akshare", "tushare"],      # 基本信息：akshare 优先（tushare有频率限制）
-    "holder": ["akshare"],                # 股东数据：只有 akshare
-    "dividend": ["akshare"],              # 分红数据：只有 akshare
+    "price": ["tushare", "akshare"],      # 日线行情:tushare 优先(稳定)
+    "financial": ["akshare", "tushare"],  # 财务数据:akshare 优先(功能全)
+    "basic": ["akshare", "tushare"],      # 基本信息:akshare 优先(tushare有频率限制)
+    "holder": ["akshare"],                # 股东数据:只有 akshare
+    "dividend": ["akshare"],              # 分红数据:只有 akshare
 }
 
 # 尝试导入 akshare
@@ -51,7 +51,7 @@ try:
     import pandas as pd
     DATA_SOURCES["akshare"]["available"] = True
 except ImportError:
-    print("警告: akshare 未安装，请运行: pip install akshare pandas")
+    print("警告: akshare 未安装,请运行: pip install akshare pandas")
 
 # 尝试导入 tushare
 try:
@@ -75,7 +75,7 @@ def check_tushare_config() -> bool:
 
 
 def get_available_data_source() -> str:
-    """获取默认数据源（向后兼容）"""
+    """获取默认数据源(向后兼容)"""
     if DATA_SOURCES["akshare"]["available"]:
         return "akshare"
     if DATA_SOURCES["tushare"]["available"] and check_tushare_config():
@@ -102,7 +102,7 @@ def get_best_data_source(data_type: str) -> str:
             if DATA_SOURCES["akshare"]["available"]:
                 return "akshare"
 
-    # 降级：返回任何可用的
+    # 降级:返回任何可用的
     if DATA_SOURCES["akshare"]["available"]:
         return "akshare"
     if DATA_SOURCES["tushare"]["available"] and check_tushare_config():
@@ -128,7 +128,7 @@ def init_tushare_api():
     if token:
         try:
             pro = ts.pro_api(token)
-            # 使用 daily 接口测试连接（免费账户可用）
+            # 使用 daily 接口测试连接(免费账户可用)
             pro.daily(ts_code='000001.SZ', start_date='20260101', end_date='20260101')
             return pro
         except Exception as e:
@@ -137,12 +137,12 @@ def init_tushare_api():
     return None
 
 
-# tushare API 实例（延迟初始化）
+# tushare API 实例(延迟初始化)
 _tushare_pro = None
 
 
 def get_tushare_pro():
-    """获取 tushare pro 实例（延迟初始化）"""
+    """获取 tushare pro 实例(延迟初始化)"""
     global _tushare_pro
     if _tushare_pro is None:
         _tushare_pro = init_tushare_api()
@@ -190,7 +190,7 @@ def get_cache_path(code: str, data_type: str) -> str:
 
 
 def load_cache(code: str, data_type: str) -> Optional[dict]:
-    """加载缓存数据（当天有效）"""
+    """加载缓存数据(当天有效)"""
     cache_path = get_cache_path(code, data_type)
     if os.path.exists(cache_path):
         try:
@@ -274,7 +274,7 @@ def get_stock_info_tushare(code: str) -> dict:
         return {"code": code, "error": "tushare 未配置或不可用"}
 
     try:
-        # 转换代码格式：600519 -> 600519.SH
+        # 转换代码格式:600519 -> 600519.SH
         ts_code = convert_to_ts_code(code)
 
         # 获取基本信息
@@ -367,7 +367,7 @@ def get_financial_indicators_tushare(code: str, limit: int = 8) -> list:
 
 
 def convert_to_ts_code(code: str) -> str:
-    """转换股票代码格式：600519 -> 600519.SH"""
+    """转换股票代码格式:600519 -> 600519.SH"""
     code = code.strip()
     if '.' in code:
         return code
@@ -382,10 +382,10 @@ def convert_to_ts_code(code: str) -> str:
     return f"{code}.SH"
 
 
-# ========== 统一接口（自动选择数据源） ==========
+# ========== 统一接口(自动选择数据源) ==========
 
 def get_stock_info(code: str, data_source: str = None) -> dict:
-    """获取股票基本信息（自动选择数据源）"""
+    """获取股票基本信息(自动选择数据源)"""
     if data_source is None:
         data_source = get_available_data_source()
 
@@ -395,21 +395,21 @@ def get_stock_info(code: str, data_source: str = None) -> dict:
             return result
         # 失败时降级到 akshare
         if DATA_SOURCES["akshare"]["available"]:
-            print(f"tushare 获取失败，降级到 akshare...")
+            print(f"tushare 获取失败,降级到 akshare...")
             data_source = "akshare"
         else:
             return {"code": code, "error": f"tushare 失败且 akshare 不可用: {result.get('error', '')}"}
 
     if data_source == "akshare":
         if not DATA_SOURCES["akshare"]["available"]:
-            return {"code": code, "error": "akshare 未安装，请运行: pip install akshare"}
+            return {"code": code, "error": "akshare 未安装,请运行: pip install akshare"}
         return get_stock_info_akshare(code)
 
     return {"code": code, "error": "没有可用的数据源"}
 
 
 def get_financial_data(code: str, years: int = 3, data_source: str = None) -> dict:
-    """获取财务数据（自动选择数据源）"""
+    """获取财务数据(自动选择数据源)"""
     if data_source is None:
         data_source = get_available_data_source()
 
@@ -419,21 +419,21 @@ def get_financial_data(code: str, years: int = 3, data_source: str = None) -> di
             return result
         # 失败时降级到 akshare
         if DATA_SOURCES["akshare"]["available"]:
-            print(f"tushare 获取失败，降级到 akshare...")
+            print(f"tushare 获取失败,降级到 akshare...")
             data_source = "akshare"
         else:
             return {"error": f"tushare 失败且 akshare 不可用: {result.get('error', '')}"}
 
     if data_source == "akshare":
         if not DATA_SOURCES["akshare"]["available"]:
-            return {"error": "akshare 未安装，请运行: pip install akshare"}
+            return {"error": "akshare 未安装,请运行: pip install akshare"}
         return get_financial_data_akshare(code, years)
 
     return {"error": "没有可用的数据源"}
 
 
 def get_financial_indicators(code: str, limit: int = 8, data_source: str = None) -> list:
-    """获取财务指标（自动选择数据源）"""
+    """获取财务指标(自动选择数据源)"""
     if data_source is None:
         data_source = get_available_data_source()
 
@@ -442,7 +442,7 @@ def get_financial_indicators(code: str, limit: int = 8, data_source: str = None)
         if result:
             return result
         if DATA_SOURCES["akshare"]["available"]:
-            print(f"tushare 获取失败，降级到 akshare...")
+            print(f"tushare 获取失败,降级到 akshare...")
         else:
             return []
 
@@ -481,13 +481,13 @@ def get_valuation_data(code: str) -> dict:
 
     except Exception as e:
         result["error"] = str(e)
-        result["note"] = "估值历史数据获取失败，将使用基本信息中的估值"
+        result["note"] = "估值历史数据获取失败,将使用基本信息中的估值"
 
     return result
 
 
 def get_price_data_tushare(code: str, days: int = 60) -> dict:
-    """使用 tushare 获取价格数据（稳定）"""
+    """使用 tushare 获取价格数据(稳定)"""
     pro = get_tushare_pro()
     if not pro:
         return {"error": "tushare 不可用"}
@@ -564,16 +564,16 @@ def get_dividend_data(code: str) -> dict:
 
 
 def get_price_data(code: str, days: int = 60, data_source: str = None) -> dict:
-    """获取价格数据（tushare 优先，失败降级到 akshare）"""
+    """获取价格数据(tushare 优先,失败降级到 akshare)"""
     if data_source is None:
         data_source = get_best_data_source("price")
 
-    # 优先使用 tushare（稳定）
+    # 优先使用 tushare(稳定)
     if data_source == "tushare" or DATA_SOURCES["tushare"]["available"]:
         result = get_price_data_tushare(code, days)
         if "error" not in result and result:
             return result
-        print(f"    tushare 价格数据获取失败，尝试 akshare...")
+        print(f"    tushare 价格数据获取失败,尝试 akshare...")
 
     # 降级到 akshare
     return get_price_data_akshare(code, days)
@@ -653,7 +653,7 @@ def fetch_stock_data(code: str, data_type: str = "all", years: int = 3,
         data_type: 数据类型 (all/basic/financial/valuation/holder)
         years: 获取多少年的历史数据
         use_cache: 是否使用缓存
-        data_source: 数据源 (auto/akshare/tushare)，默认自动选择最佳
+        data_source: 数据源 (auto/akshare/tushare),默认自动选择最佳
     """
     # 尝试加载缓存
     if use_cache:
@@ -671,7 +671,7 @@ def fetch_stock_data(code: str, data_type: str = "all", years: int = 3,
 
     print(f"正在获取 {code} 的数据...")
 
-    # 基本信息：akshare 优先（tushare 有频率限制）
+    # 基本信息:akshare 优先(tushare 有频率限制)
     if data_type in ["all", "basic"]:
         print("  - 获取基本信息...")
         source = data_source if data_source and data_source != "auto" else get_best_data_source("basic")
@@ -679,7 +679,7 @@ def fetch_stock_data(code: str, data_type: str = "all", years: int = 3,
         if "data_source" in result["basic_info"]:
             result["data_sources_used"].append(f"basic:{result['basic_info']['data_source']}")
 
-    # 财务数据：akshare 优先（功能全）
+    # 财务数据:akshare 优先(功能全)
     if data_type in ["all", "financial"]:
         print("  - 获取财务数据...")
         source = data_source if data_source and data_source != "auto" else get_best_data_source("financial")
@@ -689,13 +689,13 @@ def fetch_stock_data(code: str, data_type: str = "all", years: int = 3,
         print("  - 获取财务指标...")
         result["financial_indicators"] = get_financial_indicators(code, data_source=source)
 
-    # 估值数据：akshare
+    # 估值数据:akshare
     if data_type in ["all", "valuation"]:
         print("  - 获取估值数据...")
         result["valuation"] = get_valuation_data(code)
         result["data_sources_used"].append("valuation:akshare")
 
-    # 价格数据：tushare 优先（稳定）
+    # 价格数据:tushare 优先(稳定)
     if data_type in ["all", "valuation"]:
         print("  - 获取价格数据...")
         source = data_source if data_source and data_source != "auto" else get_best_data_source("price")
@@ -704,7 +704,7 @@ def fetch_stock_data(code: str, data_type: str = "all", years: int = 3,
         actual_source = price_data.get("data_source", source)
         result["data_sources_used"].append(f"price:{actual_source}")
 
-    # 股东数据：akshare
+    # 股东数据:akshare
     if data_type in ["all", "holder"]:
         print("  - 获取股东数据...")
         result["holder"] = get_holder_data(code)
@@ -770,9 +770,9 @@ def print_data_source_status():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="A股数据获取工具（支持双数据源）")
+    parser = argparse.ArgumentParser(description="A股数据获取工具(支持双数据源)")
     parser.add_argument("--code", type=str, help="股票代码 (如: 600519)")
-    parser.add_argument("--codes", type=str, help="多个股票代码，逗号分隔 (如: 600519,000858)")
+    parser.add_argument("--codes", type=str, help="多个股票代码,逗号分隔 (如: 600519,000858)")
     parser.add_argument("--data-type", type=str, default="basic",
                        choices=["all", "basic", "financial", "valuation", "holder"],
                        help="数据类型 (默认: basic)")

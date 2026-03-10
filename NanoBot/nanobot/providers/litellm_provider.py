@@ -7,6 +7,9 @@ import string
 from typing import Any
 
 import json_repair
+
+os.environ.setdefault("LITELLM_LOCAL_MODEL_COST_MAP", "True")
+
 import litellm
 from litellm import acompletion
 from loguru import logger

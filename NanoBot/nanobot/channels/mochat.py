@@ -834,7 +834,7 @@ class MochatChannel(BaseChannel):
         if not self._cursor_path.exists():
             return
         try:
-            data = json.loads(self._cursor_path.read_text("utf-8"))
+            data = json.loads(self._cursor_path.read_text(encoding="utf-8"))
         except Exception as e:
             logger.warning("Failed to read Mochat cursor file: {}", e)
             return
@@ -850,7 +850,7 @@ class MochatChannel(BaseChannel):
             self._cursor_path.write_text(json.dumps({
                 "schemaVersion": 1, "updatedAt": now_iso(),
                 "cursors": self._session_cursor,
-            }, ensure_ascii=False, indent=2) + "\n", "utf-8")
+            }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         except Exception as e:
             logger.warning("Failed to save Mochat cursor file: {}", e)
 

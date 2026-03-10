@@ -1,116 +1,117 @@
-# å½åçäº§æ»å¼ï¼GDPï¼?
-**ææ¡£ID**: 227
-**åå§é¾æ¥**: https://tushare.pro/document/2?doc_id=227
+# 国内生产总值（GDP）
+
+**文档ID**: 227
+**原始链接**: https://tushare.pro/document/2?doc_id=227
 
 ---
 
-## GDPæ°æ®
+## GDP数据
 
-æ¥å£ï¼cn_gdpæè¿°ï¼è·åå½æ°ç»æµä¹GDPæ°æ®ééï¼åæ¬¡æå¤?0000ï¼ä¸æ¬¡å¯ä»¥æåå¨é¨æ°æ®æéï¼ç¨æ·ç§¯ç´¯600ç§¯åå¯ä»¥ä½¿ç¨ï¼å·ä½è¯·åéç§¯åè·ååæ³
+接口：cn_gdp描述：获取国民经济之GDP数据限量：单次最大10000，一次可以提取全部数据权限：用户积累600积分可以使用，具体请参阅积分获取办法
 
-è¾å¥åæ°
+输入参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>å¿é?/th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>必选</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>q</td>
 <td>str</td>
 <td>N</td>
-<td>å­£åº¦ï¼?019Q1è¡¨ç¤ºï¼?019å¹´ç¬¬ä¸å­£åº¦ï¼?/td>
+<td>季度（2019Q1表示，2019年第一季度）</td>
 </tr>
 <tr>
 <td>start_q</td>
 <td>str</td>
 <td>N</td>
-<td>å¼å§å­£åº?/td>
+<td>开始季度</td>
 </tr>
 <tr>
 <td>end_q</td>
 <td>str</td>
 <td>N</td>
-<td>ç»æå­£åº¦</td>
+<td>结束季度</td>
 </tr>
 <tr>
 <td>fields</td>
 <td>str</td>
 <td>N</td>
-<td>æå®è¾åºå­æ®µï¼e.g. fields='quarter,gdp,gdp_yoy'ï¼?/td>
+<td>指定输出字段（e.g. fields='quarter,gdp,gdp_yoy'）</td>
 </tr>
 </tbody></table>
-è¾åºåæ°
+输出参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>é»è®¤æ¾ç¤º</th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>默认显示</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>quarter</td>
 <td>str</td>
 <td>Y</td>
-<td>å­£åº¦</td>
+<td>季度</td>
 </tr>
 <tr>
 <td>gdp</td>
 <td>float</td>
 <td>Y</td>
-<td>GDPç´¯è®¡å¼ï¼äº¿åï¼?/td>
+<td>GDP累计值（亿元）</td>
 </tr>
 <tr>
 <td>gdp_yoy</td>
 <td>float</td>
 <td>Y</td>
-<td>å½å­£åæ¯å¢éï¼%ï¼?/td>
+<td>当季同比增速（%）</td>
 </tr>
 <tr>
 <td>pi</td>
 <td>float</td>
 <td>Y</td>
-<td>ç¬¬ä¸äº§ä¸ç´¯è®¡å¼ï¼äº¿åï¼?/td>
+<td>第一产业累计值（亿元）</td>
 </tr>
 <tr>
 <td>pi_yoy</td>
 <td>float</td>
 <td>Y</td>
-<td>ç¬¬ä¸äº§ä¸åæ¯å¢éï¼%ï¼?/td>
+<td>第一产业同比增速（%）</td>
 </tr>
 <tr>
 <td>si</td>
 <td>float</td>
 <td>Y</td>
-<td>ç¬¬äºäº§ä¸ç´¯è®¡å¼ï¼äº¿åï¼?/td>
+<td>第二产业累计值（亿元）</td>
 </tr>
 <tr>
 <td>si_yoy</td>
 <td>float</td>
 <td>Y</td>
-<td>ç¬¬äºäº§ä¸åæ¯å¢éï¼%ï¼?/td>
+<td>第二产业同比增速（%）</td>
 </tr>
 <tr>
 <td>ti</td>
 <td>float</td>
 <td>Y</td>
-<td>ç¬¬ä¸äº§ä¸ç´¯è®¡å¼ï¼äº¿åï¼?/td>
+<td>第三产业累计值（亿元）</td>
 </tr>
 <tr>
 <td>ti_yoy</td>
 <td>float</td>
 <td>Y</td>
-<td>ç¬¬ä¸äº§ä¸åæ¯å¢éï¼%ï¼?/td>
+<td>第三产业同比增速（%）</td>
 </tr>
 </tbody></table>
-æ¥å£è°ç¨
+接口调用
 
 ```
 
@@ -119,12 +120,12 @@ pro = ts.pro_api()
 df = pro.cn_gdp(start_q='2018Q1', end_q='2019Q3')
 
 
-#è·åæå®å­æ®µ
+#获取指定字段
 df = pro.cn_gdp(start_q='2018Q1', end_q='2019Q3', fields='quarter,gdp,gdp_yoy')
 
 ```
 
-æ°æ®æ ·ä¾
+数据样例
 
 ```
     quarter          gdp gdp_yoy          pi pi_yoy           si si_yoy           ti ti_yoy

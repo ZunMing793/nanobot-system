@@ -58,7 +58,7 @@ This file provides a curated catalog of available skills from multiple platforms
 
 | Skill | Description | Install Command |
 |-------|-------------|-----------------|
-| `agent-browser` | Browser automation with Playwright | Already installed at `agent-browser` |
+| `agent-browser` | Browser automation with Playwright | Already installed at `C:/Users/79345/.claude/skills/agent-browser` |
 
 ### Communication
 
@@ -92,28 +92,28 @@ This file provides a curated catalog of available skills from multiple platforms
 ## Scenario-Based Recommendations
 
 ### "I need to analyze a document"
-1. **PDF** 鈫?`pdf` skill
-2. **Word** 鈫?`docx` skill
-3. **Excel** 鈫?`xlsx` skill
-4. **PowerPoint** 鈫?`pptx` skill
+1. **PDF** → `pdf` skill
+2. **Word** → `docx` skill
+3. **Excel** → `xlsx` skill
+4. **PowerPoint** → `pptx` skill
 
 ### "I need to search the web"
-1. **General search** 鈫?`tavily-search` or `exa-web-search-free`
-2. **Social media** 鈫?`twitter-search`
+1. **General search** → `tavily-search` or `exa-web-search-free`
+2. **Social media** → `twitter-search`
 
 ### "I need to handle financial data"
-1. **Chinese stocks** 鈫?`tushare-finance` or `china-stock-analysis`
-2. **General stocks** 鈫?`stock-market-pro`
+1. **Chinese stocks** → `tushare-finance` or `china-stock-analysis`
+2. **General stocks** → `stock-market-pro`
 
 ### "I need to automate browser tasks"
-鈫?`agent-browser` skill
+→ `agent-browser` skill
 
 ### "I need to process video/audio"
-鈫?`ffmpeg-video-editor` skill
+→ `ffmpeg-video-editor` skill
 
 ### "I need help with coding"
-1. **React/Next.js** 鈫?`vercel-react-best-practices`
-2. **General** 鈫?Search `npx skills find [technology]`
+1. **React/Next.js** → `vercel-react-best-practices`
+2. **General** → Search `npx skills find [technology]`
 
 ---
 
@@ -150,25 +150,25 @@ curl -s "https://api.github.com/repos/<owner>/<repo>/contents/skills/<skill-name
 
 **Step 2: Create skill directory structure**
 ```bash
-mkdir -p <skill-name>/{scripts,references}
+mkdir -p C:/Users/79345/.claude/skills/<skill-name>/{scripts,references}
 ```
 
 **Step 3: Download files**
 ```bash
 # Download SKILL.md (required)
 wget "https://raw.githubusercontent.com/<owner>/<repo>/main/skills/<skill-name>/SKILL.md" \
-  -O <skill-name>/SKILL.md
+  -O C:/Users/79345/.claude/skills/<skill-name>/SKILL.md
 
 # Download scripts (if any)
 wget "https://raw.githubusercontent.com/<owner>/<repo>/main/skills/<skill-name>/scripts/script.py" \
-  -O <skill-name>/scripts/script.py
+  -O C:/Users/79345/.claude/skills/<skill-name>/scripts/script.py
 ```
 
 **Step 4: Batch download all files in a directory**
 ```bash
 for f in $(curl -s "https://api.github.com/repos/<owner>/<repo>/contents/skills/<skill-name>/scripts" | jq -r ".[].name"); do
   wget "https://raw.githubusercontent.com/<owner>/<repo>/main/skills/<skill-name>/scripts/$f" \
-    -O "<skill-name>/scripts/$f"
+    -O "C:/Users/79345/.claude/skills/<skill-name>/scripts/$f"
 done
 ```
 
@@ -206,13 +206,13 @@ done
 
 ```bash
 # 1. Check if skill has scripts
-ls <skill-name>/scripts/
+ls C:/Users/79345/.claude/skills/<skill-name>/scripts/
 
 # 2. If scripts exist, verify allowed-tools in SKILL.md
-grep "allowed-tools:" <skill-name>/SKILL.md
+grep "allowed-tools:" C:/Users/79345/.claude/skills/<skill-name>/SKILL.md
 
 # 3. If API needed, create config.json
-echo '{"api_key": "your_key"}' > <skill-name>/config.json
+echo '{"api_key": "your_key"}' > C:/Users/79345/.claude/skills/<skill-name>/config.json
 
 # 4. Restart bots to load new skills
 ```

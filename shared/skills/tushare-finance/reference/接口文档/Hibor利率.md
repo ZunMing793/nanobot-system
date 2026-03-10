@@ -1,112 +1,113 @@
-# Hiborå©ç
+# Hibor利率
 
-**ææ¡£ID**: 153
-**åå§é¾æ¥**: https://tushare.pro/document/2?doc_id=153
+**文档ID**: 153
+**原始链接**: https://tushare.pro/document/2?doc_id=153
 
 ---
 
-## Hiborå©ç
+## Hibor利率
 
-æ¥å£ï¼hiboræè¿°ï¼Hiborå©çééï¼åæ¬¡æå¤?000è¡æ°æ®ï¼æ»éä¸éå¶ï¼å¯éè¿è®¾ç½®å¼å§åç»ææ¥æåæ®µè·åç§¯åï¼ç¨æ·ç§¯ç´?20ç§¯åå¯ä»¥è°åï¼å·ä½è¯·åéç§¯åè·ååæ³
+接口：hibor描述：Hibor利率限量：单次最大4000行数据，总量不限制，可通过设置开始和结束日期分段获取积分：用户积累120积分可以调取，具体请参阅积分获取办法
 
-HIBOR (Hongkong InterBank Offered Rate)ï¼æ¯é¦æ¸¯é¶è¡åè¡ä¸æåå©çãæé¦æ¸¯è´§å¸å¸åºä¸ï¼é¶è¡ä¸é¶è¡ä¹é´çä¸å¹´æä»¥ä¸çç­æèµéåè´·å©çï¼ä»ä¼¦æ¦åä¸æåå©çï¼LIBORï¼åååºæ¥çã?
-è¾å¥åæ°
+HIBOR (Hongkong InterBank Offered Rate)，是香港银行同行业拆借利率。指香港货币市场上，银行与银行之间的一年期以下的短期资金借贷利率，从伦敦同业拆借利率（LIBOR）变化出来的。
+
+输入参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>å¿é?/th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>必选</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>date</td>
 <td>str</td>
 <td>N</td>
-<td>æ¥æ  (æ¥æè¾å¥æ ¼å¼ï¼YYYYMMDDï¼ä¸å?</td>
+<td>日期  (日期输入格式：YYYYMMDD，下同)</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>str</td>
 <td>N</td>
-<td>å¼å§æ¥æ?/td>
+<td>开始日期</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>str</td>
 <td>N</td>
-<td>ç»ææ¥æ</td>
+<td>结束日期</td>
 </tr>
 </tbody></table>
-è¾åºåæ°
+输出参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>é»è®¤æ¾ç¤º</th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>默认显示</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>date</td>
 <td>str</td>
 <td>Y</td>
-<td>æ¥æ</td>
+<td>日期</td>
 </tr>
 <tr>
 <td>on</td>
 <td>float</td>
 <td>Y</td>
-<td>éå¤</td>
+<td>隔夜</td>
 </tr>
 <tr>
 <td>1w</td>
 <td>float</td>
 <td>Y</td>
-<td>1å?/td>
+<td>1周</td>
 </tr>
 <tr>
 <td>2w</td>
 <td>float</td>
 <td>Y</td>
-<td>2å?/td>
+<td>2周</td>
 </tr>
 <tr>
 <td>1m</td>
 <td>float</td>
 <td>Y</td>
-<td>1ä¸ªæ</td>
+<td>1个月</td>
 </tr>
 <tr>
 <td>2m</td>
 <td>float</td>
 <td>Y</td>
-<td>2ä¸ªæ</td>
+<td>2个月</td>
 </tr>
 <tr>
 <td>3m</td>
 <td>float</td>
 <td>Y</td>
-<td>3ä¸ªæ</td>
+<td>3个月</td>
 </tr>
 <tr>
 <td>6m</td>
 <td>float</td>
 <td>Y</td>
-<td>6ä¸ªæ</td>
+<td>6个月</td>
 </tr>
 <tr>
 <td>12m</td>
 <td>float</td>
 <td>Y</td>
-<td>12ä¸ªæ</td>
+<td>12个月</td>
 </tr>
 </tbody></table>
-æ¥å£è°ç¨
+接口调用
 
 ```
 
@@ -116,7 +117,7 @@ df = pro.hibor(start_date='20180101', end_date='20181130')
 
 ```
 
-æ°æ®æ ·ä¾
+数据样例
 
 ```
      date       on       1w       2w       1m       2m       3m       6m  \

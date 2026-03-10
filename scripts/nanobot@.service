@@ -12,6 +12,7 @@ ExecStart=/home/NanoBot/.venv/bin/python -m nanobot gateway --config config.json
 Restart=always
 RestartSec=5
 KillSignal=SIGINT
+SuccessExitStatus=130 143
 TimeoutStopSec=30
 Environment=PYTHONUNBUFFERED=1
 

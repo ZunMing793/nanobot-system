@@ -1,93 +1,99 @@
-# Tushare API å¿«éåè?
-æ¬ææ¡£æä¾æå¸¸ç¨ç?Tushare API æ¥å£åä»£ç ç¤ºä¾ã?
-**ä½è?*: [StanleyChanH](https://github.com/StanleyChanH)
+# Tushare API 快速参考
 
-## è¡ç¥¨æ°æ®
+本文档提供最常用的 Tushare API 接口和代码示例。
 
-### è·åè¡ç¥¨åè¡¨
+**作者**: [StanleyChanH](https://github.com/StanleyChanH)
+
+## 股票数据
+
+### 获取股票列表
 ```python
 import tushare as ts
 pro = ts.pro_api()
 
-# è·åæææ­£å¸¸ä¸å¸çè¡ç¥¨
+# 获取所有正常上市的股票
 df = pro.stock_basic(list_status='L')
 
-# ç­éç¹å®äº¤ææ
-df_sz = pro.stock_basic(exchange='SZSE')  # æ·±äº¤æ
-df_sh = pro.stock_basic(exchange='SSE')   # ä¸äº¤æ
+# 筛选特定交易所
+df_sz = pro.stock_basic(exchange='SZSE')  # 深交所
+df_sh = pro.stock_basic(exchange='SSE')   # 上交所
 ```
 
-### è·åæ¥çº¿è¡æ
+### 获取日线行情
 ```python
-# ååªè¡ç¥¨
+# 单只股票
 df = pro.daily(ts_code='000001.SZ', start_date='20241201', end_date='20241231')
 
-# å¤åªè¡ç¥¨
+# 多只股票
 df = pro.daily(ts_code='000001.SZ,600000.SH', start_date='20241201', end_date='20241231')
 
-# ææ¥ææè¡ç¥?df = pro.daily(trade_date='20241231')
+# 某日所有股票
+df = pro.daily(trade_date='20241231')
 ```
 
-### è·åè´¢å¡æ°æ®
+### 获取财务数据
 ```python
-# å©æ¶¦è¡?df = pro.income(ts_code='600000.SH', start_date='20240101', end_date='20241231')
+# 利润表
+df = pro.income(ts_code='600000.SH', start_date='20240101', end_date='20241231')
 
-# èµäº§è´åºè¡¨
+# 资产负债表
 df = pro.balancesheet(ts_code='600000.SH', start_date='20240101', end_date='20241231')
 
-# ç°éæµéè¡?df = pro.cashflow(ts_code='600000.SH', start_date='20240101', end_date='20241231')
+# 现金流量表
+df = pro.cashflow(ts_code='600000.SH', start_date='20240101', end_date='20241231')
 
-# è´¢å¡ææ 
+# 财务指标
 df = pro.fina_indicator(ts_code='600000.SH', start_date='20240101', end_date='20241231')
 ```
 
-## ææ°æ°æ®
+## 指数数据
 
-### è·åææ°åè¡¨
+### 获取指数列表
 ```python
-df = pro.index_basic(market='SSE')  # ä¸äº¤æææ°
-df = pro.index_basic(market='SZSE') # æ·±äº¤æææ°
+df = pro.index_basic(market='SSE')  # 上交所指数
+df = pro.index_basic(market='SZSE') # 深交所指数
 ```
 
-### è·åææ°è¡æ
+### 获取指数行情
 ```python
-# ä¸è¯ææ°
+# 上证指数
 df = pro.index_daily(ts_code='000001.SH', start_date='20241201', end_date='20241231')
 
-# æ·±è¯ææ
+# 深证成指
 df = pro.index_daily(ts_code='399001.SZ', start_date='20241201', end_date='20241231')
 ```
 
-## åºéæ°æ®
+## 基金数据
 
-### è·ååºéåè¡¨
+### 获取基金列表
 ```python
-df = pro.fund_basic(market='E')  # åºååºé
-df = pro.fund_basic(market='O')  # åºå¤åºé
+df = pro.fund_basic(market='E')  # 场内基金
+df = pro.fund_basic(market='O')  # 场外基金
 ```
 
-### è·ååºéåå?```python
+### 获取基金净值
+```python
 df = pro.fund_nav(ts_code='000001.OF', start_date='20241201', end_date='20241231')
 ```
 
-## å®è§ç»æµ
+## 宏观经济
 
-### GDP æ°æ®
+### GDP 数据
 ```python
 df = pro.gdp(start_q='2020011', end_q='2024044')
 ```
 
-### CPI æ°æ®
+### CPI 数据
 ```python
 df = pro.cpi(start_date='20240101', end_date='20241231')
 ```
 
-### PMI æ°æ®
+### PMI 数据
 ```python
 df = pro.pmi(start_date='20240101', end_date='20241231')
 ```
 
-### å©çæ°æ®
+### 利率数据
 ```python
 # Shibor
 df = pro.shibor(start_date='20241201', end_date='20241231')
@@ -96,29 +102,30 @@ df = pro.shibor(start_date='20241201', end_date='20241231')
 df = pro.lpr(start_date='20241201', end_date='20241231')
 ```
 
-## æ¸¯è¡ç¾è¡
+## 港股美股
 
-### æ¸¯è¡æ°æ®
+### 港股数据
 ```python
-# æ¸¯è¡åè¡¨
+# 港股列表
 df = pro.hk_basic()
 
-# æ¸¯è¡è¡æ
+# 港股行情
 df = pro.hk_daily(ts_code='00700.HK', start_date='20241201', end_date='20241231')
 ```
 
-### ç¾è¡æ°æ®
+### 美股数据
 ```python
-# ç¾è¡åè¡¨
+# 美股列表
 df = pro.us_basic()
 
-# ç¾è¡è¡æ
+# 美股行情
 df = pro.us_daily(ts_code='AAPL', start_date='20241201', end_date='20241231')
 ```
 
-## å¸¸è§æ¥è¯¢æ¨¡å¼
+## 常见查询模式
 
-### ææ¥æèå´æ¥è¯?```python
+### 按日期范围查询
+```python
 df = pro.daily(
     ts_code='000001.SZ',
     start_date='20240101',  # YYYYMMDD
@@ -126,40 +133,43 @@ df = pro.daily(
 )
 ```
 
-### æäº¤ææ¥æ¥è¯¢
+### 按交易日查询
 ```python
 df = pro.daily(trade_date='20241231')
 ```
 
-### è·åææ°æ°æ?```python
-# åè·åæè¿çäº¤ææ?import datetime
+### 获取最新数据
+```python
+# 先获取最近的交易日
+import datetime
 today = datetime.datetime.now().strftime('%Y%m%d')
 df = pro.daily(trade_date=today)
 ```
 
-## æ°æ®å¤çæå·?
-### æ°æ®æ¸æ´
+## 数据处理技巧
+
+### 数据清洗
 ```python
-# å»é¤åçæ°æ®
+# 去除停牌数据
 df = df[df['vol'] > 0]
 
-# æåº
+# 排序
 df = df.sort_values('trade_date')
 
-# éç½®ç´¢å¼
+# 重置索引
 df = df.reset_index(drop=True)
 ```
 
-### æ°æ®ä¿å­
+### 数据保存
 ```python
-# ä¿å­å?CSV
+# 保存到 CSV
 df.to_csv('data.csv', index=False)
 
-# ä¿å­å?Excel
+# 保存到 Excel
 df.to_excel('data.xlsx', index=False)
 ```
 
-## éè¯¯å¤ç
+## 错误处理
 
 ```python
 import tushare as ts
@@ -169,44 +179,50 @@ try:
     df = pro.daily(ts_code='000001.SZ', start_date='20241201', end_date='20241231')
     print(df.head())
 except ts.errors.TushareException as e:
-    print(f"Tushare API éè¯¯: {e}")
+    print(f"Tushare API 错误: {e}")
 except Exception as e:
-    print(f"éè¯¯: {e}")
+    print(f"错误: {e}")
 ```
 
-## æ§è½ä¼å
+## 性能优化
 
-### æ¹éè·å
+### 批量获取
 ```python
-# ä¸æ¬¡è·åå¤åªè¡ç¥?stock_codes = ['000001.SZ', '600000.SH', '000002.SZ']
+# 一次获取多只股票
+stock_codes = ['000001.SZ', '600000.SH', '000002.SZ']
 df = pro.daily(ts_code=','.join(stock_codes), start_date='20241201', end_date='20241231')
 ```
 
-### æ§å¶è¯·æ±é¢ç
+### 控制请求频率
 ```python
 import time
 
 for stock in stock_codes:
     df = pro.daily(ts_code=stock, start_date='20241201', end_date='20241231')
-    time.sleep(0.3)  # é¿åè¶é
+    time.sleep(0.3)  # 避免超限
 ```
 
-## å¸¸ç¨å­æ®µè¯´æ
+## 常用字段说明
 
-### æ¥çº¿è¡æå­æ®µ
-- `trade_date`: äº¤ææ¥æ
-- `ts_code`: è¡ç¥¨ä»£ç 
-- `open`: å¼çä»·
-- `high`: æé«ä»·
-- `low`: æä½ä»·
-- `close`: æ¶çä»?- `vol`: æäº¤éï¼æï¼
-- `amount`: æäº¤é¢ï¼ååï¼?
-### è´¢å¡ææ å­æ®µ
-- `end_date`: æ¥åæ?- `roe`: åèµäº§æ¶çç?- `net_profit_margin`: éå®åå©ç
-- `gross_margin`: éå®æ¯å©ç
-- `debt_to_assets`: èµäº§è´åºç
+### 日线行情字段
+- `trade_date`: 交易日期
+- `ts_code`: 股票代码
+- `open`: 开盘价
+- `high`: 最高价
+- `low`: 最低价
+- `close`: 收盘价
+- `vol`: 成交量（手）
+- `amount`: 成交额（千元）
 
-## æ´å¤æ¥å£
+### 财务指标字段
+- `end_date`: 报告期
+- `roe`: 净资产收益率
+- `net_profit_margin`: 销售净利率
+- `gross_margin`: 销售毛利率
+- `debt_to_assets`: 资产负债率
 
-å®æ´æ¥å£åè¡¨åè¯¦ç»è¯´æè¯·æ¥çï¼?- [æ¥å£ææ¡£ç´¢å¼](docs/README.md)
-- [Tushare å®æ¹ææ¡£](https://tushare.pro/document/2)
+## 更多接口
+
+完整接口列表和详细说明请查看：
+- [接口文档索引](docs/README.md)
+- [Tushare 官方文档](https://tushare.pro/document/2)

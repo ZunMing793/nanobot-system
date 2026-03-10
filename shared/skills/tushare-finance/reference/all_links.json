@@ -18,7 +18,7 @@
     "level": 1
   },
   {
-    "name": "每日股本（盘前）",
+    "name": "每日股本(盘前)",
     "url": "https://tushare.pro/document/2?doc_id=329",
     "doc_id": "329",
     "level": 1
@@ -150,19 +150,19 @@
     "level": 1
   },
   {
-    "name": "实时Tick（爬虫）",
+    "name": "实时Tick(爬虫)",
     "url": "https://tushare.pro/document/2?doc_id=315",
     "doc_id": "315",
     "level": 1
   },
   {
-    "name": "实时成交（爬虫）",
+    "name": "实时成交(爬虫)",
     "url": "https://tushare.pro/document/2?doc_id=316",
     "doc_id": "316",
     "level": 1
   },
   {
-    "name": "实时排名（爬虫）",
+    "name": "实时排名(爬虫)",
     "url": "https://tushare.pro/document/2?doc_id=317",
     "doc_id": "317",
     "level": 1
@@ -336,13 +336,13 @@
     "level": 1
   },
   {
-    "name": "股票开户数据（停）",
+    "name": "股票开户数据(停)",
     "url": "https://tushare.pro/document/2?doc_id=164",
     "doc_id": "164",
     "level": 1
   },
   {
-    "name": "股票开户数据（旧）",
+    "name": "股票开户数据(旧)",
     "url": "https://tushare.pro/document/2?doc_id=165",
     "doc_id": "165",
     "level": 1
@@ -390,7 +390,7 @@
     "level": 1
   },
   {
-    "name": "股票技术面因子(专业版）",
+    "name": "股票技术面因子(专业版)",
     "url": "https://tushare.pro/document/2?doc_id=328",
     "doc_id": "328",
     "level": 1
@@ -468,13 +468,13 @@
     "level": 1
   },
   {
-    "name": "融资融券标的（盘前）",
+    "name": "融资融券标的(盘前)",
     "url": "https://tushare.pro/document/2?doc_id=326",
     "doc_id": "326",
     "level": 1
   },
   {
-    "name": "转融券交易汇总(停）",
+    "name": "转融券交易汇总(停)",
     "url": "https://tushare.pro/document/2?doc_id=332",
     "doc_id": "332",
     "level": 1
@@ -486,13 +486,13 @@
     "level": 1
   },
   {
-    "name": "转融券交易明细(停）",
+    "name": "转融券交易明细(停)",
     "url": "https://tushare.pro/document/2?doc_id=333",
     "doc_id": "333",
     "level": 1
   },
   {
-    "name": "做市借券交易汇总(停）",
+    "name": "做市借券交易汇总(停)",
     "url": "https://tushare.pro/document/2?doc_id=334",
     "doc_id": "334",
     "level": 1
@@ -510,37 +510,37 @@
     "level": 1
   },
   {
-    "name": "个股资金流向（THS）",
+    "name": "个股资金流向(THS)",
     "url": "https://tushare.pro/document/2?doc_id=348",
     "doc_id": "348",
     "level": 1
   },
   {
-    "name": "个股资金流向（DC）",
+    "name": "个股资金流向(DC)",
     "url": "https://tushare.pro/document/2?doc_id=349",
     "doc_id": "349",
     "level": 1
   },
   {
-    "name": "板块资金流向（THS)",
+    "name": "板块资金流向(THS)",
     "url": "https://tushare.pro/document/2?doc_id=371",
     "doc_id": "371",
     "level": 1
   },
   {
-    "name": "行业资金流向（THS）",
+    "name": "行业资金流向(THS)",
     "url": "https://tushare.pro/document/2?doc_id=343",
     "doc_id": "343",
     "level": 1
   },
   {
-    "name": "板块资金流向（DC）",
+    "name": "板块资金流向(DC)",
     "url": "https://tushare.pro/document/2?doc_id=344",
     "doc_id": "344",
     "level": 1
   },
   {
-    "name": "大盘资金流向（DC）",
+    "name": "大盘资金流向(DC)",
     "url": "https://tushare.pro/document/2?doc_id=345",
     "doc_id": "345",
     "level": 1
@@ -630,7 +630,7 @@
     "level": 1
   },
   {
-    "name": "开盘竞价成交（当日）",
+    "name": "开盘竞价成交(当日)",
     "url": "https://tushare.pro/document/2?doc_id=369",
     "doc_id": "369",
     "level": 1
@@ -678,19 +678,19 @@
     "level": 1
   },
   {
-    "name": "榜单数据（开盘啦）",
+    "name": "榜单数据(开盘啦)",
     "url": "https://tushare.pro/document/2?doc_id=347",
     "doc_id": "347",
     "level": 1
   },
   {
-    "name": "题材数据（开盘啦）",
+    "name": "题材数据(开盘啦)",
     "url": "https://tushare.pro/document/2?doc_id=350",
     "doc_id": "350",
     "level": 1
   },
   {
-    "name": "题材成分（开盘啦）",
+    "name": "题材成分(开盘啦)",
     "url": "https://tushare.pro/document/2?doc_id=351",
     "doc_id": "351",
     "level": 1
@@ -798,7 +798,7 @@
     "level": 1
   },
   {
-    "name": "申万行业成分（分级）",
+    "name": "申万行业成分(分级)",
     "url": "https://tushare.pro/document/2?doc_id=335",
     "doc_id": "335",
     "level": 1
@@ -1068,7 +1068,7 @@
     "level": 1
   },
   {
-    "name": "可转债技术面因子(专业版）",
+    "name": "可转债技术面因子(专业版)",
     "url": "https://tushare.pro/document/2?doc_id=392",
     "doc_id": "392",
     "level": 1
@@ -1134,7 +1134,7 @@
     "level": 1
   },
   {
-    "name": "外汇基础信息（海外）",
+    "name": "外汇基础信息(海外)",
     "url": "https://tushare.pro/document/2?doc_id=178",
     "doc_id": "178",
     "level": 1
@@ -1404,7 +1404,7 @@
     "level": 1
   },
   {
-    "name": "国内生产总值（GDP）",
+    "name": "国内生产总值(GDP)",
     "url": "https://tushare.pro/document/2?doc_id=227",
     "doc_id": "227",
     "level": 1
@@ -1416,13 +1416,13 @@
     "level": 1
   },
   {
-    "name": "居民消费价格指数（CPI）",
+    "name": "居民消费价格指数(CPI)",
     "url": "https://tushare.pro/document/2?doc_id=228",
     "doc_id": "228",
     "level": 1
   },
   {
-    "name": "工业生产者出厂价格指数（PPI）",
+    "name": "工业生产者出厂价格指数(PPI)",
     "url": "https://tushare.pro/document/2?doc_id=245",
     "doc_id": "245",
     "level": 1
@@ -1440,7 +1440,7 @@
     "level": 1
   },
   {
-    "name": "货币供应量（月）",
+    "name": "货币供应量(月)",
     "url": "https://tushare.pro/document/2?doc_id=242",
     "doc_id": "242",
     "level": 1
@@ -1452,7 +1452,7 @@
     "level": 1
   },
   {
-    "name": "社融增量（月度）",
+    "name": "社融增量(月度)",
     "url": "https://tushare.pro/document/2?doc_id=310",
     "doc_id": "310",
     "level": 1
@@ -1464,7 +1464,7 @@
     "level": 1
   },
   {
-    "name": "采购经理指数（PMI）",
+    "name": "采购经理指数(PMI)",
     "url": "https://tushare.pro/document/2?doc_id=325",
     "doc_id": "325",
     "level": 1
@@ -1524,13 +1524,13 @@
     "level": 1
   },
   {
-    "name": "新闻快讯（短讯）",
+    "name": "新闻快讯(短讯)",
     "url": "https://tushare.pro/document/2?doc_id=143",
     "doc_id": "143",
     "level": 1
   },
   {
-    "name": "新闻通讯（长篇）",
+    "name": "新闻通讯(长篇)",
     "url": "https://tushare.pro/document/2?doc_id=195",
     "doc_id": "195",
     "level": 1

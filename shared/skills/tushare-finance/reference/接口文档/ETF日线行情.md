@@ -1,23 +1,23 @@
-# ETFæ¥çº¿è¡æ
+# ETF日线行情
 
-**ææ¡£ID**: 127
-**åå§é¾æ¥**: https://tushare.pro/document/2?doc_id=127
+**文档ID**: 127
+**原始链接**: https://tushare.pro/document/2?doc_id=127
 
 ---
 
-## ETFæ¥çº¿è¡æ
+## ETF日线行情
 
-æ¥å£ï¼fund_dailyæè¿°ï¼è·åETFè¡ææ¯æ¥æ¶çåæäº¤æ°æ®ï¼åå²è¶è¿10å¹´ééï¼åæ¬¡æå¤?000è¡è®°å½ï¼å¯ä»¥æ ¹æ®ETFä»£ç åæ¥æå¾ªç¯è·ååå²ï¼æ»éä¸éå¶ç§¯åï¼éè¦è³å°?000ç§¯åæå¯ä»¥è°åï¼5000ç§¯åé¢æ¬¡æ´é«ï¼å·ä½è¯·åéç§¯åè·ååæ³
+接口：fund_daily描述：获取ETF行情每日收盘后成交数据，历史超过10年限量：单次最大2000行记录，可以根据ETF代码和日期循环获取历史，总量不限制积分：需要至少5000积分才可以调取，5000积分频次更高，具体请参阅积分获取办法
 
-è¾å¥åæ°
+输入参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>å¿é?/th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>必选</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
@@ -25,37 +25,37 @@
 <td>ts_code</td>
 <td>str</td>
 <td>N</td>
-<td>åºéä»£ç </td>
+<td>基金代码</td>
 </tr>
 <tr>
 <td>trade_date</td>
 <td>str</td>
 <td>N</td>
-<td>äº¤ææ¥æ(YYYYMMDDæ ¼å¼ï¼ä¸å?</td>
+<td>交易日期(YYYYMMDD格式，下同)</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>str</td>
 <td>N</td>
-<td>å¼å§æ¥æ?/td>
+<td>开始日期</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>str</td>
 <td>N</td>
-<td>ç»ææ¥æ</td>
+<td>结束日期</td>
 </tr>
 </tbody>
 </table>
-è¾åºåæ°
+输出参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>é»è®¤æ¾ç¤º</th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>默认显示</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
@@ -63,80 +63,81 @@
 <td>ts_code</td>
 <td>str</td>
 <td>Y</td>
-<td>TSä»£ç </td>
+<td>TS代码</td>
 </tr>
 <tr>
 <td>trade_date</td>
 <td>str</td>
 <td>Y</td>
-<td>äº¤ææ¥æ</td>
+<td>交易日期</td>
 </tr>
 <tr>
 <td>open</td>
 <td>float</td>
 <td>Y</td>
-<td>å¼çä»·(å?</td>
+<td>开盘价(元)</td>
 </tr>
 <tr>
 <td>high</td>
 <td>float</td>
 <td>Y</td>
-<td>æé«ä»·(å?</td>
+<td>最高价(元)</td>
 </tr>
 <tr>
 <td>low</td>
 <td>float</td>
 <td>Y</td>
-<td>æä½ä»·(å?</td>
+<td>最低价(元)</td>
 </tr>
 <tr>
 <td>close</td>
 <td>float</td>
 <td>Y</td>
-<td>æ¶çä»?å?</td>
+<td>收盘价(元)</td>
 </tr>
 <tr>
 <td>pre_close</td>
 <td>float</td>
 <td>Y</td>
-<td>æ¨æ¶çä»·(å?</td>
+<td>昨收盘价(元)</td>
 </tr>
 <tr>
 <td>change</td>
 <td>float</td>
 <td>Y</td>
-<td>æ¶¨è·é¢?å?</td>
+<td>涨跌额(元)</td>
 </tr>
 <tr>
 <td>pct_chg</td>
 <td>float</td>
 <td>Y</td>
-<td>æ¶¨è·å¹?%)</td>
+<td>涨跌幅(%)</td>
 </tr>
 <tr>
 <td>vol</td>
 <td>float</td>
 <td>Y</td>
-<td>æäº¤é?æ?</td>
+<td>成交量(手)</td>
 </tr>
 <tr>
 <td>amount</td>
 <td>float</td>
 <td>Y</td>
-<td>æäº¤é¢?åå)</td>
+<td>成交额(千元)</td>
 </tr>
 </tbody>
 </table>
-æ¥å£ç¤ºä¾
+接口示例
 
 ```
 pro = ts.pro_api()
 
-#è·åâæ²ªæ·?00ETFåå¤âETF2025å¹´ä»¥æ¥çè¡æï¼å¹¶éè¿fieldsåæ°æå®è¾åºäºé¨åå­æ®?df = pro.fund_daily(ts_code='510330.SH', start_date='20250101', end_date='20250618', fields='trade_date,open,high,low,close,vol,amount')
+#获取”沪深300ETF华夏”ETF2025年以来的行情，并通过fields参数指定输出了部分字段
+df = pro.fund_daily(ts_code='510330.SH', start_date='20250101', end_date='20250618', fields='trade_date,open,high,low,close,vol,amount')
 
 ```
 
-æ°æ®ç¤ºä¾
+数据示例
 
 ```
    trade_date   open   high    low  close         vol       amount

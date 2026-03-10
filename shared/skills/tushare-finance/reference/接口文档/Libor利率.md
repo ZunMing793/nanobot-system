@@ -1,117 +1,119 @@
-# Liborå©ç
+# Libor利率
 
-**ææ¡£ID**: 152
-**åå§é¾æ¥**: https://tushare.pro/document/2?doc_id=152
+**文档ID**: 152
+**原始链接**: https://tushare.pro/document/2?doc_id=152
 
 ---
 
-## Liboræåå©ç?
-æ¥å£ï¼liboræè¿°ï¼Liboræåå©çééï¼åæ¬¡æå¤?000è¡æ°æ®ï¼æ»éä¸éå¶ï¼å¯éè¿è®¾ç½®å¼å§åç»ææ¥æåæ®µè·åç§¯åï¼ç¨æ·ç§¯ç´?20ç§¯åå¯ä»¥è°åï¼å·ä½è¯·åéç§¯åè·ååæ³
+## Libor拆借利率
 
-Liborï¼London Interbank Offered Rate ï¼ï¼å³ä¼¦æ¦åä¸æåå©çï¼æ¯æä¼¦æ¦çç¬¬ä¸æµé¶è¡ä¹é´ç­æèµéåè´·çå©çï¼æ¯å½ééèå¸åºä¸­å¤§å¤æ°æµ®å¨å©ççåºç¡å©çãä½ä¸ºé¶è¡ä»å¸åºä¸ç­¹éèµéè¿è¡è½¬è´·çèèµææ¬ï¼è´·æ¬¾åè®®ä¸­è®®å®çLIBORéå¸¸æ¯ç±å å®¶æå®çåèé¶è¡ï¼å¨è§å®çæ¶é´ï¼ä¸è¬æ¯ä¼¦æ¦æ¶é´ä¸å11ï¼?0ï¼æ¥ä»·çå¹³åå©çã?
-è¾å¥åæ°
+接口：libor描述：Libor拆借利率限量：单次最大4000行数据，总量不限制，可通过设置开始和结束日期分段获取积分：用户积累120积分可以调取，具体请参阅积分获取办法
+
+Libor（London Interbank Offered Rate ），即伦敦同业拆借利率，是指伦敦的第一流银行之间短期资金借贷的利率，是国际金融市场中大多数浮动利率的基础利率。作为银行从市场上筹集资金进行转贷的融资成本，贷款协议中议定的LIBOR通常是由几家指定的参考银行，在规定的时间（一般是伦敦时间上午11：00）报价的平均利率。
+
+输入参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>å¿é?/th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>必选</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>date</td>
 <td>str</td>
 <td>N</td>
-<td>æ¥æ (æ¥æè¾å¥æ ¼å¼ï¼YYYYMMDDï¼ä¸å?</td>
+<td>日期 (日期输入格式：YYYYMMDD，下同)</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>str</td>
 <td>N</td>
-<td>å¼å§æ¥æ?/td>
+<td>开始日期</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>str</td>
 <td>N</td>
-<td>ç»ææ¥æ</td>
+<td>结束日期</td>
 </tr>
 <tr>
 <td>curr_type</td>
 <td>str</td>
 <td>N</td>
-<td>è´§å¸ä»£ç   (USDç¾å  EURæ¬§å  JPYæ¥å  GBPè±é  CHFçéï¼é»è®¤æ¯USD)</td>
+<td>货币代码  (USD美元  EUR欧元  JPY日元  GBP英镑  CHF瑞郎，默认是USD)</td>
 </tr>
 </tbody></table>
-è¾åºåæ°
+输出参数
 
 <table>
 <thead>
 <tr>
-<th>åç§°</th>
-<th>ç±»å</th>
-<th>é»è®¤æ¾ç¤º</th>
-<th>æè¿°</th>
+<th>名称</th>
+<th>类型</th>
+<th>默认显示</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>date</td>
 <td>str</td>
 <td>Y</td>
-<td>æ¥æ</td>
+<td>日期</td>
 </tr>
 <tr>
 <td>curr_type</td>
 <td>str</td>
 <td>Y</td>
-<td>è´§å¸</td>
+<td>货币</td>
 </tr>
 <tr>
 <td>on</td>
 <td>float</td>
 <td>Y</td>
-<td>éå¤</td>
+<td>隔夜</td>
 </tr>
 <tr>
 <td>1w</td>
 <td>float</td>
 <td>Y</td>
-<td>1å?/td>
+<td>1周</td>
 </tr>
 <tr>
 <td>1m</td>
 <td>float</td>
 <td>Y</td>
-<td>1ä¸ªæ</td>
+<td>1个月</td>
 </tr>
 <tr>
 <td>2m</td>
 <td>float</td>
 <td>Y</td>
-<td>2ä¸ªæ</td>
+<td>2个月</td>
 </tr>
 <tr>
 <td>3m</td>
 <td>float</td>
 <td>Y</td>
-<td>3ä¸ªæ</td>
+<td>3个月</td>
 </tr>
 <tr>
 <td>6m</td>
 <td>float</td>
 <td>Y</td>
-<td>6ä¸ªæ</td>
+<td>6个月</td>
 </tr>
 <tr>
 <td>12m</td>
 <td>float</td>
 <td>Y</td>
-<td>12ä¸ªæ</td>
+<td>12个月</td>
 </tr>
 </tbody></table>
-æ¥å£è°ç¨
+接口调用
 
 ```
 
@@ -121,7 +123,7 @@ df = pro.libor(curr_type='USD', start_date='20180101', end_date='20181130')
 
 ```
 
-æ°æ®æ ·ä¾
+数据样例
 
 ```
      date     curr_type       on       1w       1m       2m       3m       6m  \

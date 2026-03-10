@@ -36,12 +36,12 @@ class FinancialAnalyzer:
     def _assess_roe(self, roe: float) -> str:
         """根据ROE评估盈利能力"""
         if roe > 20:
-            return "优秀 - ROE超过20%，盈利能力很强"
+            return "优秀 - ROE超过20%,盈利能力很强"
         elif roe > 15:
-            return "良好 - ROE在15-20%之间，盈利能力较强"
+            return "良好 - ROE在15-20%之间,盈利能力较强"
         elif roe > 10:
-            return "一般 - ROE在10-15%之间，盈利能力中等"
-        return "较弱 - ROE低于10%，盈利能力需要改善"
+            return "一般 - ROE在10-15%之间,盈利能力中等"
+        return "较弱 - ROE低于10%,盈利能力需要改善"
 
     def analyze_profitability(self) -> Dict:
         """盈利能力分析"""
@@ -116,20 +116,20 @@ class FinancialAnalyzer:
 
         # 风险评估
         risk_checks = [
-            (debt_ratio and debt_ratio > 70, f"资产负债率偏高 ({debt_ratio:.1f}%)，需关注偿债压力"),
-            (current_ratio and current_ratio < 1, f"流动比率偏低 ({current_ratio:.2f})，短期偿债能力较弱"),
-            (quick_ratio and quick_ratio < 0.8, f"速动比率偏低 ({quick_ratio:.2f})，短期流动性风险"),
+            (debt_ratio and debt_ratio > 70, f"资产负债率偏高 ({debt_ratio:.1f}%),需关注偿债压力"),
+            (current_ratio and current_ratio < 1, f"流动比率偏低 ({current_ratio:.2f}),短期偿债能力较弱"),
+            (quick_ratio and quick_ratio < 0.8, f"速动比率偏低 ({quick_ratio:.2f}),短期流动性风险"),
         ]
         result["risks"] = [msg for condition, msg in risk_checks if condition]
 
         # 综合评估
         risk_count = len(result["risks"])
         if risk_count == 0:
-            result["assessment"] = "良好 - 偿债能力指标正常，财务结构稳健"
+            result["assessment"] = "良好 - 偿债能力指标正常,财务结构稳健"
         elif risk_count == 1:
-            result["assessment"] = "一般 - 存在一项风险指标，需持续关注"
+            result["assessment"] = "一般 - 存在一项风险指标,需持续关注"
         else:
-            result["assessment"] = "较弱 - 存在多项风险指标，偿债压力较大"
+            result["assessment"] = "较弱 - 存在多项风险指标,偿债压力较大"
 
         return result
 
@@ -162,16 +162,16 @@ class FinancialAnalyzer:
 
         # 观察分析
         observation_checks = [
-            (ar_days and ar_days > 90, f"应收账款周转天数较长 ({ar_days:.0f}天)，回款较慢"),
-            (inventory_days and inventory_days > 180, f"存货周转天数较长 ({inventory_days:.0f}天)，库存管理需关注"),
-            (asset_turnover and asset_turnover < 0.5, f"总资产周转率较低 ({asset_turnover:.2f})，资产利用效率有待提高"),
+            (ar_days and ar_days > 90, f"应收账款周转天数较长 ({ar_days:.0f}天),回款较慢"),
+            (inventory_days and inventory_days > 180, f"存货周转天数较长 ({inventory_days:.0f}天),库存管理需关注"),
+            (asset_turnover and asset_turnover < 0.5, f"总资产周转率较低 ({asset_turnover:.2f}),资产利用效率有待提高"),
         ]
         result["observations"] = [msg for condition, msg in observation_checks if condition]
 
         if not result["observations"]:
             result["assessment"] = "良好 - 运营效率指标正常"
         else:
-            result["assessment"] = "需关注 - " + "；".join(result["observations"])
+            result["assessment"] = "需关注 - " + ";".join(result["observations"])
 
         return result
 
@@ -192,7 +192,7 @@ class FinancialAnalyzer:
         if all(g > 0 for g in values[:4]):
             return f"{name}持续正增长"
         elif values[0] < 0:
-            return f"{name}负增长，需关注"
+            return f"{name}负增长,需关注"
         return None
 
     def analyze_growth(self) -> Dict:
@@ -326,7 +326,7 @@ class FinancialAnalyzer:
             if gm_change > 10:
                 result["signals"].append({
                     "type": "毛利率大幅波动",
-                    "description": f"毛利率变动{gm_change:.1f}个百分点，需关注原因",
+                    "description": f"毛利率变动{gm_change:.1f}个百分点,需关注原因",
                     "severity": "中"
                 })
 
@@ -342,7 +342,7 @@ class FinancialAnalyzer:
                     if ocf_ratio < 0.5:
                         result["signals"].append({
                             "type": "现金流与利润背离",
-                            "description": f"经营现金流/净利润 = {ocf_ratio:.1%}，盈利质量存疑",
+                            "description": f"经营现金流/净利润 = {ocf_ratio:.1%},盈利质量存疑",
                             "severity": "高"
                         })
             except (IndexError, KeyError):

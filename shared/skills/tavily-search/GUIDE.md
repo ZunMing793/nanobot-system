@@ -1,9 +1,10 @@
-# Tavily Search è¯¦ç»æå
+# Tavily Search 详细指南
 
-AI ä¼åçç½ç»æç´¢å·¥å·ã?
+AI 优化的网络搜索工具。
+
 ---
 
-## 1. æç´¢å½ä»¤
+## 1. 搜索命令
 
 ```bash
 node {baseDir}/scripts/search.mjs "query"
@@ -14,18 +15,18 @@ node {baseDir}/scripts/search.mjs "query" --topic news
 
 ---
 
-## 2. åæ°éé¡¹
+## 2. 参数选项
 
-| åæ° | è¯´æ | é»è®¤å?|
+| 参数 | 说明 | 默认值 |
 |------|------|--------|
-| `-n <count>` | è¿åç»ææ°é | 5 |
-| `--deep` | æ·±åº¦æç´¢ï¼æ´å¨é¢ä½æ´æ¢ï¼ | å³é­ |
-| `--topic <topic>` | æç´¢ç±»åï¼`general` æ?`news` | general |
-| `--days <n>` | æ°é»æç´¢æ¶éå¶å¤©æ?| - |
+| `-n <count>` | 返回结果数量 | 5 |
+| `--deep` | 深度搜索（更全面但更慢） | 关闭 |
+| `--topic <topic>` | 搜索类型：`general` 或 `news` | general |
+| `--days <n>` | 新闻搜索时限制天数 | - |
 
 ---
 
-## 3. ä»?URL æååå®¹
+## 3. 从 URL 提取内容
 
 ```bash
 node {baseDir}/scripts/extract.mjs "https://example.com/article"
@@ -33,19 +34,21 @@ node {baseDir}/scripts/extract.mjs "https://example.com/article"
 
 ---
 
-## 4. ä½¿ç¨æå·?
-| åºæ¯ | æ¨èå½ä»¤ |
+## 4. 使用技巧
+
+| 场景 | 推荐命令 |
 |------|----------|
-| å¿«éæç´?| `node {baseDir}/scripts/search.mjs "query"` |
-| è·åæ´å¤ç»æ | `node {baseDir}/scripts/search.mjs "query" -n 10` |
-| æ·±åº¦ç ç©¶ | `node {baseDir}/scripts/search.mjs "query" --deep` |
-| æ¥æ¾æ°é» | `node {baseDir}/scripts/search.mjs "query" --topic news` |
-| æåç½é¡µåå®¹ | `node {baseDir}/scripts/extract.mjs "url"` |
+| 快速搜索 | `node {baseDir}/scripts/search.mjs "query"` |
+| 获取更多结果 | `node {baseDir}/scripts/search.mjs "query" -n 10` |
+| 深度研究 | `node {baseDir}/scripts/search.mjs "query" --deep` |
+| 查找新闻 | `node {baseDir}/scripts/search.mjs "query" --topic news` |
+| 提取网页内容 | `node {baseDir}/scripts/extract.mjs "url"` |
 
 ---
 
-## 5. æ³¨æäºé¡¹
+## 5. 注意事项
 
-- API Key å·²éç½®å¨ config.json ä¸?- Tavily ä¸ä¸º AI ä¼åï¼è¿åç®æ´ãç¸å³çåå®¹çæ®µ
-- å¤æç ç©¶é®é¢ä½¿ç¨ `--deep`
-- æ¥æ¾æ¶äºæ°é»ä½¿ç¨ `--topic news`
+- API Key 已配置在 config.json 中
+- Tavily 专为 AI 优化，返回简洁、相关的内容片段
+- 复杂研究问题使用 `--deep`
+- 查找时事新闻使用 `--topic news`

@@ -36,7 +36,7 @@ print_help() {
     echo "  start <bot_id>    启动指定 bot"
     echo "  stop <bot_id>     停止指定 bot"
     echo "  restart <bot_id>  重启指定 bot"
-    echo "  status [bot_id]   查看状态（不指定则显示所有）"
+    echo "  status [bot_id]   查看状态(不指定则显示所有)"
     echo "  logs <bot_id>     查看指定 bot 日志"
     echo "  start-all         启动所有 bot"
     echo "  stop-all          停止所有 bot"
@@ -110,7 +110,7 @@ start_bot() {
     if is_running "$bot_id"; then
         echo -e "${GREEN}$bot_id 启动成功 (PID: $pid)${NC}"
     else
-        echo -e "${RED}$bot_id 启动失败，请检查日志: $log_file${NC}"
+        echo -e "${RED}$bot_id 启动失败,请检查日志: $log_file${NC}"
         rm -f "$pid_file"
         return 1
     fi
@@ -138,7 +138,7 @@ stop_bot() {
         count=$((count + 1))
     done
     
-    # 如果进程还在运行，强制杀死
+    # 如果进程还在运行,强制杀死
     if ps -p "$pid" > /dev/null 2>&1; then
         echo -e "${YELLOW}强制停止 $bot_id...${NC}"
         kill -9 "$pid" 2>/dev/null || true
