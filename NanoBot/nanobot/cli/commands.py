@@ -20,6 +20,7 @@ if sys.platform == "win32":
             pass
 
 import typer
+from loguru import logger
 from prompt_toolkit import PromptSession
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.history import FileHistory
@@ -336,7 +337,22 @@ def _make_provider(config: Config, models_config: dict | None = None):
     for fallback_name in fallback_models:
         fallback_key, fallback_cfg = _find_model_config(models_config, fallback_name)
         fallback_model = fallback_cfg.get("model", fallback_name) if fallback_cfg else fallback_name
-        fallback_provider = _make_provider_for_model(config, fallback_model, models_config)
+        try:
+            fallback_provider = _make_provider_for_model(config, fallback_model, models_config)
+        except typer.Exit:
+            logger.warning(
+                "Skip invalid fallback model {} for primary model {}",
+                fallback_name,
+                model,
+            )
+            continue
+        except Exception:
+            logger.exception(
+                "Unexpected error while creating fallback model {} for primary model {}",
+                fallback_name,
+                model,
+            )
+            continue
         targets.append(
             FallbackTarget(
                 model=fallback_model,
@@ -344,6 +360,9 @@ def _make_provider(config: Config, models_config: dict | None = None):
                 label=fallback_key or fallback_name,
             )
         )
+
+    if len(targets) == 1:
+        return primary_provider
 
     return FallbackProvider(primary=targets[0], fallbacks=targets[1:])
 

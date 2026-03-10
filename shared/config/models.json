@@ -1,7 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$comment": "NanoBot 多Bot系统 - 共享模型配置文件",
-  
+  "$comment": "NanoBot 多 Bot 系统 - 共享模型配置文件",
   "providers": {
     "nexus": {
       "name": "Nexus",
@@ -14,9 +13,14 @@
       "api_key": "sk-e4b37e57b5cd92144312f0ce306d950c",
       "api_base": "https://apis.iflow.cn/v1",
       "api_format": "openai"
+    },
+    "openrouter": {
+      "name": "OpenRouter",
+      "api_key": "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",
+      "api_base": "https://openrouter.ai/api/v1",
+      "api_format": "openai"
     }
   },
-
   "models": {
     "glm-5": {
       "name": "GLM-5",
@@ -24,7 +28,10 @@
       "provider": "nexus",
       "context": 200000,
       "max_output_tokens": 8192,
-      "fallback_models": ["kimi-k2", "step-3.5-flash-free"]
+      "fallback_models": [
+        "kimi-k2",
+        "step-3.5-flash-free"
+      ]
     },
     "kimi-k2": {
       "name": "Kimi K2",
@@ -32,11 +39,16 @@
       "provider": "iflow",
       "context": 256000,
       "max_output_tokens": 64000
+    },
+    "step-3.5-flash-free": {
+      "name": "Step 3.5 Flash Free",
+      "model": "stepfun/step-3.5-flash:free",
+      "provider": "openrouter",
+      "context": 256000,
+      "max_output_tokens": 256000
     }
   },
-
   "default_model": "glm-5",
-
   "bot_overrides": {
     "bot1_core": {
       "model": "glm-5"
