@@ -9,7 +9,7 @@
 ```markdown
 ## [FEAT-YYYYMMDD-001] 功能名称
 
-**优先级**：high/medium/low | **状态**：pending/done | **标签**：#标签
+**优先级**:high/medium/low | **状态**:pending/done | **标签**:#标签
 
 ### 需求
 用户想要什么功能
@@ -24,4 +24,4 @@
 
 ## 功能请求
 
-（暂无记录）
+(暂无记录)

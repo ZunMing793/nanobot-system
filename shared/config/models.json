@@ -27,8 +27,7 @@
       "model": "glm-5",
       "provider": "nexus",
       "context": 200000,
-      "max_output_tokens": 131072
-    },
+      "max_output_tokens": 131072,
       "fallback_models": [
         "kimi-k2",
         "step-3.5-flash-free"

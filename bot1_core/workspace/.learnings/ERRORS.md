@@ -9,7 +9,7 @@
 ```markdown
 ## [ERR-YYYYMMDD-001] 错误类型
 
-**优先级**：high/medium/low | **状态**：pending/resolved | **标签**：#标签
+**优先级**:high/medium/low | **状态**:pending/resolved | **标签**:#标签
 
 ### 错误信息
 ```
@@ -29,4 +29,4 @@
 
 ## 错误记录
 
-（暂无记录）
+(暂无记录)

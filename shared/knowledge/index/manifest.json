@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "scope": "shared",
+  "scope_type": "shared",
+  "updated_at": "2026-03-09 18:48:47",
+  "stats": {
+    "total": 1,
+    "ready": 1,
+    "pending_extraction": 0,
+    "indexed_only": 0,
+    "error": 0
+  },
+  "documents": [
+    {
+      "id": "84a08ae8714c",
+      "title": "刘澜·学习力30讲",
+      "source_path": "knowledge/raw/刘澜·学习力30讲.epub",
+      "source_name": "刘澜·学习力30讲.epub",
+      "scope": "shared",
+      "scope_type": "shared",
+      "file_type": "epub",
+      "size_bytes": 6691973,
+      "modified_at": "2026-01-30 04:41:16",
+      "sha256": "84a08ae8714ce259140fc4ed121a805009f19ad734558efb341e84e106392197",
+      "status": "ready",
+      "needs_extraction": false,
+      "recommended_skill": "summarize",
+      "extracted_path": "knowledge/extracted/刘澜·学习力30讲.epub.md",
+      "summary": "刘澜·学习力30讲(公众号懒人搜索) 刘澜·学习力30讲(公众号懒人搜索) ch001.xhtml 刘澜·学习力30讲 懒人专属群的群友们,大家好,这是小懒人给大家的《通才计划》更新的课程。 得到129RMB 的课程《刘澜·学习力30讲》…",
+      "tags": [
+        "shared",
+        "epub",
+        "shared"
+      ],
+      "extraction_engine": "epub-zip",
+      "error": ""
+    }
+  ]
+}

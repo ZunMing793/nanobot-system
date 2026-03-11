@@ -2,7 +2,7 @@
   "bot_id": "bot5_media",
   "bot_name": "自媒体助理",
   "bot_role": "worker",
-  "description": "自媒体助理 - 负责内容创作、平台运营、文案写作、数据分析",
+  "description": "自媒体助理 - 负责账号信息沉淀、定时内容生产、公众号排版入草稿箱、数据复盘和自动化/半自动化运营优化",
 
   "agents": {
     "defaults": {
@@ -24,6 +24,7 @@
       "enabled": true,
       "app_id": "102892046",
       "secret": "0HYq8Rl5Ql7TqDbzOoEf6Y0TxRwRxT0X",
+      "publicMediaBaseUrl": "https://nanobot-media.zunming.top/qq",
       "allow_from": ["*"]
     }
   }

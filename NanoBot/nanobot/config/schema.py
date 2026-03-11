@@ -195,6 +195,8 @@ class QQConfig(Base):
     enabled: bool = False
     app_id: str = ""  # 机器人 ID (AppID) from q.qq.com
     secret: str = ""  # 机器人密钥 (AppSecret) from q.qq.com
+    groq_api_key: str = ""  # Groq API key for voice transcription
+    public_media_base_url: str = ""  # Optional public base URL for outbound QQ media
     allow_from: list[str] = Field(
         default_factory=list
     )  # Allowed user openids (empty = public access)

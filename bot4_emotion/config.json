@@ -2,7 +2,7 @@
   "bot_id": "bot4_emotion",
   "bot_name": "情感助理",
   "bot_role": "worker",
-  "description": "情感助理 - 负责心理咨询、情绪支持、压力缓解、人际关系",
+  "description": "情感助理 - 负责两性情感、性知识、心理学理解、人情世故分析,以及长期情感梳理与陪伴支持",
 
   "agents": {
     "defaults": {
@@ -24,6 +24,7 @@
       "enabled": true,
       "app_id": "102857681",
       "secret": "hSDzlYMAzoeULC4xqkeZUQMJGEDCCCDE",
+      "publicMediaBaseUrl": "https://nanobot-media.zunming.top/qq",
       "allow_from": ["*"]
     }
   }

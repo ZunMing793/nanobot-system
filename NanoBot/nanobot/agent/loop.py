@@ -6,6 +6,7 @@ import asyncio
 import json
 import re
 import weakref
+from collections.abc import Iterable
 from contextlib import AsyncExitStack
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Awaitable, Callable
@@ -124,6 +125,8 @@ class AgentLoop:
             shared_learnings_path=shared_learnings_path,
             shared_memory_path=shared_memory_path,
             call_ai_func=self._call_ai_for_command,
+            session_manager=self.sessions,
+            history_window=self.memory_window,
         )
 
         # Memory and learning manager
@@ -239,6 +242,81 @@ class AgentLoop:
                 return tc.name
             return f'{tc.name}("{val[:40]}...")' if len(val) > 40 else f'{tc.name}("{val}")'
         return ", ".join(_fmt(tc) for tc in tool_calls)
+
+    @staticmethod
+    def _unique_preserve_order(items: Iterable[str]) -> list[str]:
+        """Return unique items while preserving their first-seen order."""
+        seen: set[str] = set()
+        ordered: list[str] = []
+        for item in items:
+            if not item or item in seen:
+                continue
+            seen.add(item)
+            ordered.append(item)
+        return ordered
+
+    @staticmethod
+    def _collect_string_values(value: Any) -> list[str]:
+        """Collect all string values from nested tool-call arguments."""
+        if isinstance(value, str):
+            return [value]
+        if isinstance(value, dict):
+            collected: list[str] = []
+            for nested in value.values():
+                collected.extend(AgentLoop._collect_string_values(nested))
+            return collected
+        if isinstance(value, list | tuple | set):
+            collected = []
+            for nested in value:
+                collected.extend(AgentLoop._collect_string_values(nested))
+            return collected
+        return []
+
+    @staticmethod
+    def _extract_skill_names_from_text(text: str) -> list[str]:
+        """Infer skill names from filesystem paths or wrapper commands."""
+        normalized = text.replace("\\", "/")
+        matches = re.findall(r"/skills/([^/\s]+)/", normalized)
+        skill_names = [name for name in matches if name and not name.startswith("{")]
+        if re.search(r"(?<!\S)ab(?:\s|$)", normalized) or "agent-browser" in normalized:
+            skill_names.append("agent-browser")
+        return AgentLoop._unique_preserve_order(skill_names)
+
+    def _infer_skills_from_tool_call(self, tool_name: str, arguments: Any) -> list[str]:
+        """Infer which skills were actually used based on tool-call arguments."""
+        skills: list[str] = []
+        for text in self._collect_string_values(arguments):
+            skills.extend(self._extract_skill_names_from_text(text))
+        if tool_name == "exec":
+            command = " ".join(self._collect_string_values(arguments))
+            skills.extend(self._extract_skill_names_from_text(command))
+        return self._unique_preserve_order(skills)
+
+    def _build_usage_prefix(self, tools_used: list[str], skills_used: list[str]) -> str:
+        """Build a compact Chinese prefix describing actual tools/skills used this turn."""
+        tools = self._unique_preserve_order(tools_used)
+        skills = self._unique_preserve_order(skills_used)
+        if not tools and not skills:
+            return ""
+
+        def _summarize(items: list[str], limit: int = 3) -> str:
+            if len(items) <= limit:
+                return "、".join(items)
+            return f"{'、'.join(items[:limit])} 等{len(items)}项"
+
+        parts: list[str] = []
+        if skills:
+            parts.append(f"skills：{_summarize(skills)}")
+        if tools:
+            parts.append(f"tools：{_summarize(tools)}")
+        return f"已调用：{'；'.join(parts)}"
+
+    def _prepend_usage_prefix(self, content: str, tools_used: list[str], skills_used: list[str]) -> str:
+        """Prepend the usage summary to the final visible response."""
+        prefix = self._build_usage_prefix(tools_used, skills_used)
+        if not prefix:
+            return content
+        return f"{prefix}\n\n{content}" if content else prefix
 
     @staticmethod
     def _looks_like_recording_claim(text: str | None) -> bool:
@@ -381,12 +459,13 @@ class AgentLoop:
         initial_messages: list[dict],
         on_progress: Callable[..., Awaitable[None]] | None = None,
         allowed_tool_names: set[str] | None = None,
-    ) -> tuple[str | None, list[str], list[dict]]:
-        """Run the agent iteration loop. Returns (final_content, tools_used, messages)."""
+    ) -> tuple[str | None, list[str], list[str], list[dict]]:
+        """Run the agent iteration loop. Returns (final_content, tools_used, skills_used, messages)."""
         messages = initial_messages
         iteration = 0
         final_content = None
         tools_used: list[str] = []
+        skills_used: list[str] = []
 
         while iteration < self.max_iterations:
             iteration += 1
@@ -436,6 +515,7 @@ class AgentLoop:
 
                 for tool_call in response.tool_calls:
                     tools_used.append(tool_call.name)
+                    skills_used.extend(self._infer_skills_from_tool_call(tool_call.name, tool_call.arguments))
                     args_str = json.dumps(tool_call.arguments, ensure_ascii=False)
                     logger.info("Tool call: {}({})", tool_call.name, args_str[:200])
                     if allowed_tool_names is not None and tool_call.name not in allowed_tool_names:
@@ -471,7 +551,7 @@ class AgentLoop:
                 "without completing the task. You can try breaking the task into smaller steps."
             )
 
-        return final_content, tools_used, messages
+        return final_content, self._unique_preserve_order(tools_used), self._unique_preserve_order(skills_used), messages
 
     async def run(self) -> None:
         """Run the agent loop, dispatching messages as tasks to stay responsive to /stop."""
@@ -553,7 +633,10 @@ class AgentLoop:
         """Process a single inbound message and return the response."""
         # Check for commands first
         if self.command_handler.is_command(msg.content):
-            command_response = await self.command_handler.handle(msg.content)
+            command_response = await self.command_handler.handle(
+                msg.content,
+                session_key=session_key or msg.session_key,
+            )
             if command_response:
                 # Check for model switch signal
                 if "[MODEL_SWITCH]" in command_response:
@@ -586,9 +669,10 @@ class AgentLoop:
                 history=history,
                 current_message=msg.content, channel=channel, chat_id=chat_id,
             )
-            final_content, _, all_msgs = await self._run_agent_loop(
+            final_content, _, skills_used, all_msgs = await self._run_agent_loop(
                 messages, allowed_tool_names=self._get_allowed_tool_names(channel)
             )
+            final_content = self._prepend_usage_prefix(final_content or "", [], skills_used)
             self._save_turn(session, all_msgs, 1 + len(history))
             self.sessions.save(session)
             return OutboundMessage(channel=channel, chat_id=chat_id,
@@ -677,7 +761,7 @@ class AgentLoop:
                 channel=msg.channel, chat_id=msg.chat_id, content=content, metadata=meta,
             ))
 
-        final_content, _, all_msgs = await self._run_agent_loop(
+        final_content, tools_used, skills_used, all_msgs = await self._run_agent_loop(
             initial_messages,
             on_progress=on_progress or _bus_progress,
             allowed_tool_names=allowed_tool_names,
@@ -722,6 +806,7 @@ class AgentLoop:
             except Exception as e:
                 logger.warning(f"Memory/learning auto-record failed: {e}")
 
+        final_content = self._prepend_usage_prefix(final_content, tools_used, skills_used)
         preview = final_content[:120] + "..." if len(final_content) > 120 else final_content
         logger.info("Response to {}:{}: {}", msg.channel, msg.sender_id, preview)
         return OutboundMessage(

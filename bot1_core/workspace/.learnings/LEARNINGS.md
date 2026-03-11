@@ -9,7 +9,7 @@
 ```markdown
 ## [LRN-YYYYMMDD-001] 简短标题
 
-**优先级**：high/medium/low | **状态**：pending/resolved | **标签**：#标签
+**优先级**:high/medium/low | **状态**:pending/resolved | **标签**:#标签
 
 ### 问题
 一句话描述问题
@@ -24,4 +24,4 @@
 
 ## 学习记录
 
-（暂无记录）
+(暂无记录)

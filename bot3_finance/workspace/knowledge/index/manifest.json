@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "scope": "bot3_finance",
+  "scope_type": "bot",
+  "updated_at": "2026-03-09 18:47:00",
+  "stats": {
+    "total": 0,
+    "ready": 0,
+    "pending_extraction": 0,
+    "indexed_only": 0,
+    "error": 0
+  },
+  "documents": []
+}

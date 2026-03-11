@@ -2,7 +2,7 @@
   "bot_id": "bot1_core",
   "bot_name": "核心助理",
   "bot_role": "leader",
-  "description": "核心助理 - 负责整体协调、任务分发、进程管理",
+  "description": "核心助理 - 负责需求承接、任务拆解分发、多 bot 协调整合与系统运行管理",
 
   "agents": {
     "defaults": {
@@ -24,6 +24,7 @@
       "enabled": true,
       "app_id": "102844325",
       "secret": "OnDe5X0TxRwSyV3bAjJuV7kN1fK0gN4m",
+      "publicMediaBaseUrl": "https://nanobot-media.zunming.top/qq",
       "allow_from": ["*"]
     }
   }

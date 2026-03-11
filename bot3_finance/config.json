@@ -2,7 +2,7 @@
   "bot_id": "bot3_finance",
   "bot_name": "理财助理",
   "bot_role": "worker",
-  "description": "理财助理 - 负责投资建议、资产配置、财务规划、风险评估",
+  "description": "理财助理 - 负责收支记录、财富经营分析、资产配置梳理、财务规划与理财意识培养",
 
   "agents": {
     "defaults": {
@@ -24,6 +24,7 @@
       "enabled": true,
       "app_id": "102849806",
       "secret": "GpOyY9lN0dHvaFvbIzhQ9tdO9vhUH5uj",
+      "publicMediaBaseUrl": "https://nanobot-media.zunming.top/qq",
       "allow_from": ["*"]
     }
   }

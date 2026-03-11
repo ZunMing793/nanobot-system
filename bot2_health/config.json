@@ -2,7 +2,7 @@
   "bot_id": "bot2_health",
   "bot_name": "健康助理",
   "bot_role": "worker",
-  "description": "健康助理 - 负责健康咨询、运动建议、饮食规划、睡眠改善",
+  "description": "健康助理 - 负责作息培养、睡眠记录分析、体重记录跟踪、运动记录反馈与日常健康管理",
 
   "agents": {
     "defaults": {
@@ -24,6 +24,7 @@
       "enabled": true,
       "app_id": "102846091",
       "secret": "VwNpIlFkFlIpNwV5fGsU7kO3iO4lSAsb",
+      "publicMediaBaseUrl": "https://nanobot-media.zunming.top/qq",
       "allow_from": ["*"]
     }
   }
