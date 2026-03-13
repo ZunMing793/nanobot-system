@@ -10,7 +10,7 @@ from typing import Any, Callable, Coroutine
 
 from loguru import logger
 
-from nanobot.cron.types import CronJob, CronJobState, CronPayload, CronSchedule, CronStore
+from nanobot.cron.types import CronJob, CronJobState, CronPayload, CronSchedule, CronStore, TaskPack
 
 
 def _now_ms() -> int:
@@ -88,6 +88,7 @@ class CronService:
         if self.store_path.exists():
             try:
                 data = json.loads(self.store_path.read_text(encoding="utf-8"))
+                version = data.get("version", 1)
                 jobs = []
                 for j in data.get("jobs", []):
                     jobs.append(CronJob(
@@ -118,14 +119,74 @@ class CronService:
                         updated_at_ms=j.get("updatedAtMs", 0),
                         delete_after_run=j.get("deleteAfterRun", False),
                     ))
-                self._store = CronStore(jobs=jobs)
+
+                # Load packs (v2 feature)
+                packs = []
+                for p in data.get("packs", []):
+                    packs.append(TaskPack(
+                        id=p["id"],
+                        name=p["name"],
+                        display=p["display"],
+                        description=p.get("description", ""),
+                        job_ids=p.get("jobIds", []),
+                        created_at_ms=p.get("createdAtMs", 0),
+                        updated_at_ms=p.get("updatedAtMs", 0),
+                    ))
+
+                active_pack_id = data.get("activePackId")
+
+                self._store = CronStore(
+                    version=2,
+                    jobs=jobs,
+                    packs=packs,
+                    active_pack_id=active_pack_id,
+                )
+
+                # Migrate v1 to v2: create default packs if missing
+                if version < 2 and not packs:
+                    self._create_default_packs()
+                    self._save_store()
+
             except Exception as e:
                 logger.warning("Failed to load cron store: {}", e)
                 self._store = CronStore()
+                self._create_default_packs()
         else:
             self._store = CronStore()
+            self._create_default_packs()
 
         return self._store
+
+    def _create_default_packs(self) -> None:
+        """Create the two default packs if they don't exist."""
+        if not self._store:
+            return
+
+        now = _now_ms()
+        default_packs = [
+            TaskPack(
+                id="pack_lab",
+                name="lab_competition",
+                display="实验室备赛学习",
+                description="实验室备赛期间的学习任务",
+                created_at_ms=now,
+                updated_at_ms=now,
+            ),
+            TaskPack(
+                id="pack_holiday",
+                name="holiday_home",
+                display="假期在家娱乐",
+                description="假期在家的娱乐提醒",
+                created_at_ms=now,
+                updated_at_ms=now,
+            ),
+        ]
+
+        existing_ids = {p.id for p in self._store.packs}
+        for pack in default_packs:
+            if pack.id not in existing_ids:
+                self._store.packs.append(pack)
+                logger.info("Cron: created default pack '{}'", pack.name)
 
     def _save_store(self) -> None:
         """Save jobs to disk."""
@@ -166,7 +227,20 @@ class CronService:
                     "deleteAfterRun": j.delete_after_run,
                 }
                 for j in self._store.jobs
-            ]
+            ],
+            "packs": [
+                {
+                    "id": p.id,
+                    "name": p.name,
+                    "display": p.display,
+                    "description": p.description,
+                    "jobIds": p.job_ids,
+                    "createdAtMs": p.created_at_ms,
+                    "updatedAtMs": p.updated_at_ms,
+                }
+                for p in self._store.packs
+            ],
+            "activePackId": self._store.active_pack_id,
         }
 
         self.store_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -374,3 +448,154 @@ class CronService:
             "jobs": len(store.jobs),
             "next_wake_at_ms": self._get_next_wake_ms(),
         }
+
+    # ========== Pack Management API ==========
+
+    def list_packs(self) -> list[TaskPack]:
+        """List all task packs."""
+        store = self._load_store()
+        return store.packs
+
+    def get_active_pack(self) -> TaskPack | None:
+        """Get the currently active pack."""
+        store = self._load_store()
+        if not store.active_pack_id:
+            return None
+        for pack in store.packs:
+            if pack.id == store.active_pack_id:
+                return pack
+        return None
+
+    def create_pack(self, name: str, display: str, description: str = "") -> TaskPack:
+        """Create a new empty task pack."""
+        store = self._load_store()
+        now = _now_ms()
+
+        # Check if name already exists
+        for p in store.packs:
+            if p.name == name:
+                raise ValueError(f"Pack with name '{name}' already exists")
+
+        pack = TaskPack(
+            id=f"pack_{uuid.uuid4().hex[:6]}",
+            name=name,
+            display=display,
+            description=description,
+            created_at_ms=now,
+            updated_at_ms=now,
+        )
+
+        store.packs.append(pack)
+        self._save_store()
+
+        logger.info("Cron: created pack '{}' ({})", name, pack.id)
+        return pack
+
+    def delete_pack(self, pack_id: str) -> bool:
+        """Delete a pack. Only empty packs can be deleted."""
+        store = self._load_store()
+
+        for pack in store.packs:
+            if pack.id == pack_id:
+                if pack.job_ids:
+                    raise ValueError(f"Cannot delete pack '{pack.name}': still has {len(pack.job_ids)} jobs")
+                if store.active_pack_id == pack_id:
+                    store.active_pack_id = None
+                store.packs.remove(pack)
+                self._save_store()
+                logger.info("Cron: deleted pack {}", pack_id)
+                return True
+
+        return False
+
+    def switch_pack(self, pack_id: str | None) -> tuple[bool, int]:
+        """
+        Switch to the specified pack.
+
+        - pack_id=None: disable all jobs
+        - pack_id=valid: disable all jobs, then enable jobs in this pack
+
+        Returns (success, enabled_job_count).
+        """
+        store = self._load_store()
+        now = _now_ms()
+
+        # Validate pack exists if specified
+        target_pack = None
+        if pack_id:
+            for pack in store.packs:
+                if pack.id == pack_id:
+                    target_pack = pack
+                    break
+            if not target_pack:
+                return False, 0
+
+        # 1. Disable all jobs
+        for job in store.jobs:
+            job.enabled = False
+            job.state.next_run_at_ms = None
+
+        enabled_count = 0
+
+        # 2. If a pack is specified, enable its jobs
+        if target_pack:
+            for job_id in target_pack.job_ids:
+                for job in store.jobs:
+                    if job.id == job_id:
+                        job.enabled = True
+                        job.state.next_run_at_ms = _compute_next_run(job.schedule, now)
+                        enabled_count += 1
+                        break
+            store.active_pack_id = pack_id
+            logger.info("Cron: switched to pack '{}', enabled {} jobs", target_pack.name, enabled_count)
+        else:
+            store.active_pack_id = None
+            logger.info("Cron: disabled all jobs (no active pack)")
+
+        self._save_store()
+        self._arm_timer()
+        return True, enabled_count
+
+    def add_job_to_pack(self, job_id: str, pack_id: str) -> bool:
+        """Add a job to a pack."""
+        store = self._load_store()
+
+        # Find job
+        job_exists = any(j.id == job_id for j in store.jobs)
+        if not job_exists:
+            return False
+
+        # Find pack and add job
+        for pack in store.packs:
+            if pack.id == pack_id:
+                if job_id not in pack.job_ids:
+                    pack.job_ids.append(job_id)
+                    pack.updated_at_ms = _now_ms()
+                    self._save_store()
+                    logger.info("Cron: added job {} to pack {}", job_id, pack.name)
+                return True
+
+        return False
+
+    def remove_job_from_pack(self, job_id: str, pack_id: str) -> bool:
+        """Remove a job from a pack."""
+        store = self._load_store()
+
+        for pack in store.packs:
+            if pack.id == pack_id:
+                if job_id in pack.job_ids:
+                    pack.job_ids.remove(job_id)
+                    pack.updated_at_ms = _now_ms()
+                    self._save_store()
+                    logger.info("Cron: removed job {} from pack {}", job_id, pack.name)
+                return True
+
+        return False
+
+    def get_pack_by_name(self, name: str) -> TaskPack | None:
+        """Get a pack by its internal name."""
+        store = self._load_store()
+        for pack in store.packs:
+            if pack.name == name:
+                return pack
+        return None

@@ -12,7 +12,7 @@ NanoBot_System 是一个多实例 AI 助手系统,基于 [nanobot](https://githu
 # 安装开发依赖
 cd NanoBot && pip install -e .[dev]
 
-# 运行测试
+# 运行全部测试
 cd NanoBot && pytest
 
 # 运行单个测试
@@ -30,9 +30,22 @@ cd NanoBot && python -m nanobot gateway
 # 编译 WhatsApp 桥接模块
 cd NanoBot/bridge && npm install && npm run build
 
+# 系统诊断检查
+python scripts/doctor.py
+
 # 检查多 Bot 配置
 python scripts/selfcheck_multibot.py
+
+# 烟雾测试
+python scripts/smoke_test_bot.py <bot_dir>
 ```
+
+## Code Style
+
+- Python 3.11+, 4 空格缩进, Ruff 100 字符行宽限制
+- 命名约定: 函数/模块 `snake_case`, 类 `PascalCase`, 常量 `UPPER_CASE`
+- TypeScript 源码仅在 `NanoBot/bridge/src/` 维护, `dist/` 为生成产物
+- 测试文件命名 `test_*.py`, 使用 pytest
 
 ## Architecture
 
@@ -72,6 +85,26 @@ python scripts/selfcheck_multibot.py
 
 - **schema.py**: Pydantic 配置模型,支持 camelCase 和 snake_case
 
+### Cron Pack System (`NanoBot/nanobot/cron/`)
+
+定时任务包系统，支持多套任务配置快速切换：
+
+- **types.py**: `CronJob`, `TaskPack`, `CronStore` 数据类
+- **service.py**: 任务包管理服务
+
+任务包存储在 `{bot_instance}/workspace/cron/jobs.json`，每个 bot 实例独立。
+
+```python
+# 切换任务包
+cron(action="pack_switch", pack_name="lab_competition")
+
+# 列出任务包
+cron(action="pack_list")
+
+# 添加任务到指定包
+cron(action="add", message="提醒内容", cron_expr="0 9 * * *", pack_name="lab_competition")
+```
+
 ## Multi-Bot Deployment
 
 ```
@@ -94,7 +127,24 @@ NanoBot_System/
 每个 Bot 实例包含:
 - `config.json`: 该实例的配置
 - `logs/`: 运行日志
-- `workspace/`: 工作空间(MEMORY.md, HEARTBEAT.md, 会话文件)
+- `workspace/`: 工作空间(MEMORY.md, HEARTBEAT.md, 会话文件, cron/jobs.json)
+
+### Shared Learnings
+
+`shared/learnings/SHARED.md` 存储所有 Bot 共享的学习经验。格式：
+
+```markdown
+## [SHARED-YYYYMMDD-001] 简短标题
+**适用**：所有 bot | **标签**：#标签
+### 问题
+问题描述
+### 解决
+解决方案
+### 来源
+bot-X 于 YYYY-MM-DD 发现
+```
+
+新增共享经验时追加到此文件，所有 bot 都可读取。
 
 ## Skills System
 
@@ -140,6 +190,12 @@ Provider 注册表根据以下优先级检测:
 - `test_*_provider.py`: 各 Provider 测试
 - `test_*_channel.py`: 各通道测试
 
+## Commit Guidelines
+
+- 提交信息使用简短祈使句,如 `fix: validate provider config`
+- 一次提交只解决一个主题,避免顺手修复无关问题
+- 严禁提交 `config.json`、`logs/`、`memory/`、`workspace/` 中的密钥或令牌
+
 ## Security Notes
 
 - 配置文件权限应设为 0600
@@ -147,3 +203,19 @@ Provider 注册表根据以下优先级检测:
 - Shell 工具有危险命令过滤
 - 文件操作有路径遍历保护
 - 生产环境应启用 `restrictToWorkspace`
+
+## Critical Rules
+
+### Time Sensitivity
+
+处理定时任务、日程提醒等时间相关功能时，**必须先获取当前时间**，不能假设或猜测：
+
+```python
+from datetime import datetime
+import zoneinfo
+
+beijing = zoneinfo.ZoneInfo('Asia/Shanghai')
+now = datetime.now(beijing)
+```
+
+涉及"下一个任务"、"还有多久"等表述时，必须基于实际时间计算。详见 `shared/learnings/SHARED.md`。

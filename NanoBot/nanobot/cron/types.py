@@ -53,7 +53,21 @@ class CronJob:
 
 
 @dataclass
+class TaskPack:
+    """A pack of cron jobs for easy switching between scenarios."""
+    id: str
+    name: str                              # Internal name (e.g. "work_mode")
+    display: str                           # Display name (e.g. "工作模式")
+    description: str = ""                  # Description
+    job_ids: list[str] = field(default_factory=list)  # Job IDs in this pack
+    created_at_ms: int = 0
+    updated_at_ms: int = 0
+
+
+@dataclass
 class CronStore:
     """Persistent store for cron jobs."""
-    version: int = 1
+    version: int = 2                       # Upgraded to v2 for packs support
     jobs: list[CronJob] = field(default_factory=list)
+    packs: list[TaskPack] = field(default_factory=list)
+    active_pack_id: str | None = None      # Currently active pack ID
